@@ -6,13 +6,14 @@ import pybibim
 class Value:
     """ Value class는 아무 역할도 하지 않습니다.
 
-    대신, Null, Number, Pack의 부모 class로 동작하여 다형성을 유지합니다.
+    대신, Null, Number, Bowl의 부모 class로 동작하여 다형성을 유지합니다.
     """
     pass
 
 
 class Expr:
     """ Expr class는 Bibim의 Expression 입니다. """
+
     def __init__(self, func):
         """ ExprFunc Func instance로 새 expr를 만듭니다.
 
@@ -72,6 +73,7 @@ class Null(Value):
 
 class Number(Value):
     """ 기약분수 꼴로 표현되는 유리수를 가지는 Value입니다. """
+
     @staticmethod
     def gcd(a, b):
         """ 정수 a와 b의 최소공배수를 계산합니다. """
@@ -387,31 +389,32 @@ class Number(Value):
             return "%d/%d" % (self._numerator, self._denominator)
 
 
-class Line:
-    """ LineList에 담길 Line class입니다. """
-    def __init__(self, ln_expr, expr):
-        """ 새로운 Line을 생성합니다.
+class Noodle:
+    """ Wad에 담길 Noodle class입니다. """
 
-        :param ln_expr: Line의 line number
-        :type ln_expr: Expr
-        :param expr: Line의 Expr
+    def __init__(self, nn_expr, expr):
+        """ 새로운 Noodle을 생성합니다.
+
+        :param nn_expr: Noodle의 Noodle number
+        :type nn_expr: Expr
+        :param expr: Noodle의 Expr
         :type expr: Expr
         """
-        self._ln_expr = ln_expr
+        self._nn_expr = nn_expr
         self._expr = expr
 
     @property
-    def ln_expr(self):
-        """ Line의 line number를 반환합니다.
+    def nn_expr(self):
+        """ Noodle의 noodle number를 반환합니다.
 
-        :return: line number
+        :return: noodle number
         :rtype: Expr
         """
-        return self._ln_expr
+        return self._nn_expr
 
     @property
     def expr(self):
-        """ Line의 Expr을 반환합니다.
+        """ Noodle의 Expr을 반환합니다.
 
         :return: Expr
         :rtype: Expr
@@ -419,7 +422,7 @@ class Line:
         return self._expr
 
     def set_expr(self, expr):
-        """ Line의 Expr을 등록합니다.
+        """ Noodle의 Expr을 등록합니다.
 
         :return: NullExpr
         :rtype: NullExpr
@@ -428,89 +431,91 @@ class Line:
         return NULL_EXPR_INST
 
     def __repr__(self):
-        return "[%s; %s]" % (repr(self.ln_expr), repr(self._expr))
+        return "[%s; %s]" % (repr(self.nn_expr), repr(self._expr))
 
 
-class LineList:
-    """ Pack의 Line들을 담고 있는 class입니다. """
-    def __init__(self, line):
-        """ 새로운 LineList 생성합니다.
+class Wad:
+    """ Bowl의 Noodle들을 담고 있는 class입니다. """
 
-        :param line: Line
-        :type line: Line|None
+    def __init__(self, noodle):
+        """ 새로운 Wad를 생성합니다.
+
+        :param noodle: noodle
+        :type noodle: Noodle|None
         """
 
-        if line:
-            self._lines = [line]
+        if noodle:
+            self._noodles = [noodle]
         else:
-            self._lines = list()
+            self._noodles = list()
 
     @property
-    def lines(self):
-        """ lines를 반환합니다.
+    def noodles(self):
+        """ noodles를 반환합니다.
 
-        :return: Lines
-        :rtype: list[Line]
+        :return: Noodles
+        :rtype: list[Noodle]
         """
-        return self._lines
+        return self._noodles
 
-    def append(self, line):
-        """ lines에 line을 추가합니다.
+    def put(self, noodle):
+        """ noodles에 noodle을 추가합니다.
 
-        :param line: 추가할 line
-        :return: LineList
+        :param noodle: 추가할 noodle
+        :return: Wad
         """
-        self._lines.append(line)
+        self._noodles.append(noodle)
         return self
 
     def __repr__(self):
-        return "".join(repr(line) for line in self._lines)
+        return "".join(repr(noodle) for noodle in self._noodles)
 
 
-class Pack(Value):
-    """ LineList를 담는 Pack class입니다. """
-    def __init__(self, line_list):
-        """ line_list로부터 새로운 Pack을 생성합니다.
+class Bowl(Value):
+    """ Wad를 담는 Bowl class입니다. """
 
-        :param line_list: line_list
-        :type line_list: LineList|None
+    def __init__(self, wad):
+        """ wad로부터 새로운 Bowl을 생성합니다.
+
+        :param wad: 담을 wad
+        :type wad: Wad|None
         """
-        if line_list:
-            self._line_list = line_list
+        if wad:
+            self._wad = wad
         else:
-            self._line_list = LineList(None)
+            self._wad = Wad(None)
 
     @property
-    def line_list(self):
-        """ line_list를 반환합니다.
+    def wad(self):
+        """ wad를 반환합니다.
 
-        :return: line_list
-        :rtype: LineList
+        :return: wad
+        :rtype: Wad
         """
-        return self._line_list
+        return self._wad
 
     @staticmethod
     def from_str(s):
-        """ 문자열을 Pack으로 변환합니다.
+        """ 문자열을 Bowl으로 변환합니다.
 
         :param s: 변환할 문자열
         :type s: str
-        :return: 생성된 Pack
-        :rtype: Pack
+        :return: 생성된 Bowl
+        :rtype: Bowl
         """
-        line_list = LineList(None)
-        ln = Number(0)
+        wad = Wad(None)
+        noodle_num = Number(0)
         for c in s:
-            line_list.append(Line(ValueExpr(ln), ValueExpr(Number(ord(c)))))
-            ln = ln + Number(1)
-        return Pack(line_list)
+            wad.put(Noodle(ValueExpr(noodle_num), ValueExpr(Number(ord(c)))))
+            noodle_num = noodle_num + Number(1)
+        return Bowl(wad)
 
     @staticmethod
-    def to_str(pack):
-        """ Pack을 문자열로 변환합니다.
+    def to_str(bowl):
+        """ Bowl을 문자열로 변환합니다.
 
-        :param pack: 변환할 Pack
-        :type pack: Pack
+        :param bowl: 변환할 Bowl
+        :type bowl: Bowl
         :return: 생성된 문자열
         :rtype: str
         """
@@ -518,119 +523,119 @@ class Pack(Value):
         index = 0
         while True:
             try:
-                line = pack.get_line(Number(index, 1))
+                noodle = bowl.get_noodle(Number(index, 1))
             except KeyError:
                 break
-            line_value = line.expr.eval().value
-            if not isinstance(line_value, Number):
+            noodle_value = noodle.expr.eval().value
+            if not isinstance(noodle_value, Number):
                 raise RuntimeError("Could not convert it to string, "
-                                   "line_value is not a Number: %s" % (
-                                       repr(line_value)))
-            elif line_value.denominator != 1:
+                                   "noodle value is not a Number: %s" % (
+                                       repr(noodle_value)))
+            elif noodle_value.denominator != 1:
                 raise RuntimeError("Could not convert it to string, "
-                                   "line_value's denominator is not 1: %s"
-                                   % (repr(line_value)))
-            result += chr(line_value.numerator)
+                                   "noodle value's denominator is not 1: %s"
+                                   % (repr(noodle_value)))
+            result += chr(noodle_value.numerator)
             index += 1
         return result
 
-    def get_line(self, number):
-        """ number를 line number로 가지는 Line을 반환합니다.
+    def get_noodle(self, number):
+        """ number를 noodle number로 가지는 Noodle을 반환합니다.
 
-        :param number: 가져올 Line의 line number
+        :param number: 가져올 Noodle의 noodle number
         :type number: Number
-        :return: 해당 Line
-        :rtype: Line
+        :return: 해당 Noodle
+        :rtype: Noodle
         """
-        for line in self.line_list.lines:
-            ln = line.ln_expr.eval().value
-            if not isinstance(ln, Number):
-                raise AssertionError("Line numbers must be a Number. %s is "
-                                     "not a Number" % (repr(ln),))
-            if ln == number:
-                return line
-        raise KeyError("Cannot found the line")
+        for noodle in self.wad.noodles:
+            nn = noodle.nn_expr.eval().value
+            if not isinstance(nn, Number):
+                raise AssertionError("Noodle numbers must be a Number. %s is "
+                                     "not a Number" % (repr(nn),))
+            if nn == number:
+                return noodle
+        raise KeyError("Cannot found the noodle")
 
-    def set_line(self, number, value_expr):
-        """ number를 line number로 가지는 Line의 expr를 변경합니다.
+    def set_noodle(self, number, value_expr):
+        """ number를 noodle number로 가지는 Noodle의 expr를 변경합니다.
 
-        :param number: 수정할 Line의 line number
+        :param number: 수정할 Noodle의 noodle number
         :type number: Number
-        :param value_expr: 수정할 Line의 expr
+        :param value_expr: 수정할 Noodle의 expr
         :type value_expr: ValueExpr
         :return: NullExpr
         :rtype: NullExpr
         """
-        for line in self.line_list.lines:
-            ln = line.ln_expr.eval().value
-            if not isinstance(ln, Number):
-                raise AssertionError("Line numbers must be a Number. %s is "
-                                     "not a Number" % (repr(ln),))
-            if ln == number:
-                line.set_expr(value_expr)
+        for noodle in self.wad.noodles:
+            nn = noodle.nn_expr.eval().value
+            if not isinstance(nn, Number):
+                raise AssertionError("Noodle numbers must be a Number. %s is "
+                                     "not a Number" % (repr(nn),))
+            if nn == number:
+                noodle.set_expr(value_expr)
                 return NULL_EXPR_INST
-        self.line_list.append(Line(ValueExpr(number), value_expr))
+        self.wad.put(Noodle(ValueExpr(number), value_expr))
         return NULL_EXPR_INST
 
     def __repr__(self):
-        return "{%s}" % (repr(self._line_list),)
+        return "{%s}" % (repr(self._wad),)
 
 
-class Memory(Pack):
-    """ '@' 문자에 매핑되는 특수 Pack class입니다. """
+class Memory(Bowl):
+    """ '@' 문자에 매핑되는 특수 Bowl class입니다. """
 
-    LN_CURRENT_LINE = Number(0)
-    LN_IO = Number(1)
+    NN_CURRENT_NOODLE = Number(0)
+    NN_IO = Number(1)
 
     def __init__(self):
         """ 새로운 Memory을 생성합니다. """
         super().__init__(None)
 
-    def get_line(self, number):
-        """ number를 line number로 가지는 Line을 반환합니다.
+    def get_noodle(self, number):
+        """ number를 noodle number로 가지는 Noodle을 반환합니다.
 
-        만약 number가 LN_IO일 경우, 표준 입력에서 문자열을 가져와 Line의 expr에
-        pack으로 변환해 담아서 반환합니다. 모든 입력은 utf-8로 인코딩합니다.
+        만약 number가 NN_IO일 경우, 표준 입력에서 문자열을 가져와 Noodle의 expr에
+        Bowl으로 변환해 담아서 반환합니다. 모든 입력은 utf-8로 인코딩합니다.
 
-        :param number: 가져올 Line의 line number
+        :param number: 가져올 Noodle의 noodle number
         :type number: Number
-        :return: 해당 Line
-        :rtype: Line
+        :return: 해당 Noodle
+        :rtype: Noodle
         """
-        if number == Memory.LN_IO:
+        if number == Memory.NN_IO:
             input_str = io.TextIOWrapper(sys.stdin.buffer,
                                          encoding='utf-8').read()
-            return Line(ValueExpr(Memory.LN_IO),
-                        ValueExpr(Pack.from_str(input_str)))
+            return Noodle(ValueExpr(Memory.NN_IO),
+                          ValueExpr(Bowl.from_str(input_str)))
         else:
-            return super().get_line(number)
+            return super().get_noodle(number)
 
-    def set_line(self, number, value_expr):
-        """ number를 line number로 가지는 Line의 expr를 변경합니다.
+    def set_noodle(self, number, value_expr):
+        """ number를 noodle number로 가지는 Noodle의 expr를 변경합니다.
 
-        만약 number가 LN_IO일 경우, 표준 출력으로 value_expr의 내용을
+        만약 number가 NN_IO일 경우, 표준 출력으로 value_expr의 내용을
         문자열로 변환해 출력합니다.
 
-        :param number: 수정할 Line의 line number
+        :param number: 수정할 Noodle의 noodle number
         :type number: Number
-        :param value_expr: 수정할 Line의 expr
+        :param value_expr: 수정할 Noodle의 expr
         :type value_expr: ValueExpr
         :return: NullExpr
         :rtype: NullExpr
         """
-        if number == Memory.LN_IO:
-            pack_to_print = value_expr.value
-            if not isinstance(pack_to_print, Pack):
+        if number == Memory.NN_IO:
+            bowl_to_print = value_expr.value
+            if not isinstance(bowl_to_print, Bowl):
                 raise RuntimeError("Could not print it as string, "
-                                   "expr is not a Pack: %s" % (
-                                       repr(pack_to_print)))
-            print(Pack.to_str(pack_to_print), end='')
+                                   "expr is not a Bowl: %s" % (
+                                       repr(bowl_to_print)))
+            print(Bowl.to_str(bowl_to_print), end='')
             return NULL_EXPR_INST
         else:
-            return super().set_line(number, value_expr)
+            return super().set_noodle(number, value_expr)
 
     def __repr__(self):
-        return "{" + "".join(repr(line) for line in self.line_list.lines) + "}"
+        return "{" + "".join(repr(noodle) for noodle in self.wad.noodles) + "}"
 
 
 NULL_INST = Null()

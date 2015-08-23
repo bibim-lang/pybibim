@@ -17,19 +17,19 @@ class Func:
         return datatype.NULL_EXPR_INST
 
 
-class FuncPack(Func):
-    """ pack operator ':'의 동작을 정의하는 class입니다. """
+class FuncBowl(Func):
+    """ bowl operator ':'의 동작을 정의하는 class입니다. """
 
-    def __init__(self, pack=None, ln=None):
-        """ FuncPack를 생성합니다.
+    def __init__(self, bowl=None, nn=None):
+        """ FuncBowl를 생성합니다.
 
-        :param pack: Expr를 가져올 Pack instance
-        :type pack: Pack
-        :param ln: pack의 line number
-        :type ln: Number
+        :param bowl: Expr를 가져올 Bowl instance
+        :type bowl: Bowl
+        :param nn: bowl의 noodle number
+        :type nn: Number
         """
-        self.pack = pack
-        self.ln = ln
+        self.bowl = bowl
+        self.nn = nn
 
     def __call__(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -37,14 +37,14 @@ class FuncPack(Func):
         :return: 평가된 결과
         :rtype: datatype.ValueExpr
         """
-        pack = safe_get_value(self.pack, datatype.Pack)
-        if pack is datatype.NULL_INST:
+        bowl = safe_get_value(self.bowl, datatype.Bowl)
+        if bowl is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        ln = safe_get_value(self.ln, datatype.Number)
-        if ln is datatype.NULL_INST:
+        nn = safe_get_value(self.nn, datatype.Number)
+        if nn is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
         try:
-            return safe_get_evaled_expr(pack.get_line(ln).expr)
+            return safe_get_evaled_expr(bowl.get_noodle(nn).expr)
         except KeyError:
             return datatype.NULL_EXPR_INST
 
@@ -52,22 +52,22 @@ class FuncPack(Func):
 class FuncAssign(Func):
     """ assign operator '='의 동작을 정의하는 class입니다. """
 
-    def __init__(self, pack=None, ln=None, value_expr=None):
+    def __init__(self, bowl=None, nn=None, value_expr=None):
         """ FuncAssign를 생성합니다.
 
-        만약 pack이 None이라면 기본값으로 datatype.ValueExpr(datatype.MEM)를
+        만약 bowl이 None이라면 기본값으로 datatype.ValueExpr(datatype.MEM)를
         사용합니다.
 
-        :param pack: assign 대상
-        :type pack: Pack
-        :param ln: pack의 line number
-        :type ln: Number
+        :param bowl: assign 대상
+        :type bowl: Bowl
+        :param nn: bowl의 noodle number
+        :type nn: Number
         :param value_expr: assign할 Value를 가진 ValueExpr
         :type value_expr: ValueExpr
         """
-        self.pack = pack if pack is not None else datatype.ValueExpr(
+        self.bowl = bowl if bowl is not None else datatype.ValueExpr(
             datatype.MEM)
-        self.ln = ln
+        self.nn = nn
         self.value_expr = value_expr
 
     def __call__(self):
@@ -76,14 +76,14 @@ class FuncAssign(Func):
         :return: 평가된 결과
         :rtype: datatype.ValueExpr
         """
-        pack = safe_get_value(self.pack, datatype.Pack)
-        if pack is datatype.NULL_INST:
+        bowl = safe_get_value(self.bowl, datatype.Bowl)
+        if bowl is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        ln = safe_get_value(self.ln, datatype.Number)
-        if ln is datatype.NULL_INST:
+        nn = safe_get_value(self.nn, datatype.Number)
+        if nn is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
         value_expr = safe_get_evaled_expr(self.value_expr)
-        pack.set_line(ln, value_expr)
+        bowl.set_noodle(nn, value_expr)
         return datatype.NULL_EXPR_INST
 
 
@@ -197,11 +197,11 @@ class FuncMul(Func):
         return datatype.ValueExpr(l_number * r_number)
 
 
-class FuncDiv(Func):
-    """ divide operator '/'의 동작을 정의하는 class입니다. """
+class FuncNumberSep(Func):
+    """ number separator '/'의 동작을 정의하는 class입니다. """
 
     def __init__(self, l_number=None, r_number=None):
-        """ FuncDiv를 생성합니다.
+        """ FuncNumberSep 생성합니다.
 
         :param l_number: operator의 좌측 number
         :type l_number: Number
