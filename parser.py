@@ -8,13 +8,7 @@ pg = ParserGenerator(
     list(op_map.keys()),
     precedence=[
         ('left', ['ASSIGN']),
-        ('left', ['NUMBER']),
-        ('left', ['ass_expr', 'ass_expr_m']),
-        ('left', ['MEM']),
-        ('left', ['BOWL_OPEN', 'BOWL_CLOSE']),
-        ('left', ['NOODLE_OPEN', 'NOODLE_CLOSE']),
-        ('left', ['EXPR_OPEN', 'EXPR_CLOSE']),
-        ('left', ['NOODLE_SEP']),
+        ('left', ['ass_expr']),
         ('left', ['AND', 'OR']),
         ('left', ['NOT']),
         ('left', ['EQ', 'GT', 'LT']),
@@ -23,6 +17,12 @@ pg = ParserGenerator(
         ('left', ['BOWL']),
         ('left', ['DENO']),
         ('left', ['NUMBER_SEP']),
+        ('left', ['NOODLE_SEP']),
+        ('left', ['BOWL_OPEN', 'BOWL_CLOSE']),
+        ('left', ['NOODLE_OPEN', 'NOODLE_CLOSE']),
+        ('left', ['EXPR_OPEN', 'EXPR_CLOSE']),
+        ('left', ['MEM']),
+        ('left', ['NUMBER']),
     ]
 )
 
@@ -78,7 +78,7 @@ def expr_parans(p):
     return expr
 
 
-@pg.production('expr : MEM BOWL expr ASSIGN expr', precedence='ass_expr_m')
+@pg.production('expr : MEM BOWL expr ASSIGN expr', precedence='ass_expr')
 @pg.production('expr : expr BOWL expr ASSIGN expr', precedence='ass_expr')
 def expr_assign_m(p):
     if type(p[0]) is Token and p[0].gettokentype() == 'MEM':
