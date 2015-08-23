@@ -88,13 +88,17 @@ def is_nextable_nn(number):
         return number > current_nn
 
 
+def run_file(fn):
+    with open(fn, encoding='utf-8') as f:
+        code = f.read()
+        bowl = parse(code)
+        run(bowl)
+
+
 if __name__ == "__main__":
     argv = sys.argv
     if len(argv) != 2:
         print("You must supply a filename")
     filename = argv[1]
 
-    with open(filename, encoding='utf-8') as f:
-        code = f.read()
-        bowl = parse(code)
-        run(bowl)
+    run_file(filename)
