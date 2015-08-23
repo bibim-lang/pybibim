@@ -631,6 +631,8 @@ class Memory(Bowl):
                                        repr(bowl_to_print)))
             print(Bowl.to_str(bowl_to_print), end='')
             return NULL_EXPR_INST
+        elif number == Memory.NN_CURRENT_NOODLE:
+            return NULL_EXPR_INST
         else:
             return super().set_noodle(number, value_expr)
 
