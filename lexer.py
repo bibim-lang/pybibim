@@ -30,6 +30,6 @@ for name, regex in op_map.items():
     lg.add(name, regex)
 
 lg.ignore('\s+')
-lg.ignore('~#((?!#~).)*#~')
+lg.ignore('~\s*#((?!#~).)*#\s*~')
 
 lexer = lg.build()
