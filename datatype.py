@@ -616,6 +616,10 @@ class Memory(Bowl):
         만약 number가 NN_IO일 경우, 표준 출력으로 value_expr의 내용을
         문자열로 변환해 출력합니다.
 
+        또, number가 NN_CURRENT_NOODLE 경우 바로 NullExpr을 반환합니다.
+        만약 현재 noodle number의 값을 update해야 할 경우
+        set_current_noodle_number method를 대신 사용하세요.
+
         :param number: 수정할 Noodle의 noodle number
         :type number: Number
         :param value_expr: 수정할 Noodle의 expr
@@ -635,6 +639,15 @@ class Memory(Bowl):
             return NULL_EXPR_INST
         else:
             return super().set_noodle(number, value_expr)
+
+    def set_current_noodle_number(self, value_expr):
+        """ 현재 noodle number를 지정합니다.
+        :param value_expr: 현재 Noodle number의 ValueExpr
+        :type value_expr: ValueExpr
+        :return: NullExpr
+        :rtype: NullExpr
+        """
+        return super().set_noodle(Memory.NN_CURRENT_NOODLE, value_expr)
 
     def __repr__(self):
         return "{" + "".join(repr(noodle) for noodle in self.wad.noodles) + "}"

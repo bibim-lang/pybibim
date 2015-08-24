@@ -29,12 +29,10 @@ def run(bowl_inst):
     """
     if not isinstance(bowl_inst, datatype.Bowl):
         raise AssertionError('The code must be a Bowl.')
-    datatype.MEM.set_noodle(datatype.Memory.NN_CURRENT_NOODLE,
-                            datatype.NULL_EXPR_INST)
+    datatype.MEM.set_current_noodle_number(datatype.NULL_EXPR_INST)
     current_noodle = get_next_noodle(bowl_inst)
     while current_noodle is not None:
-        datatype.MEM.set_noodle(datatype.Memory.NN_CURRENT_NOODLE,
-                                current_noodle.nn_expr.eval())
+        datatype.MEM.set_current_noodle_number(current_noodle.nn_expr.eval())
         current_noodle.expr.eval()
         current_noodle = get_next_noodle(bowl_inst)
 
