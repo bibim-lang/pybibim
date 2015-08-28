@@ -1,3 +1,4 @@
+# coding=utf-8
 import datatype
 from utils import safe_get_value, safe_get_evaled_expr
 

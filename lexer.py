@@ -1,3 +1,4 @@
+# coding=utf-8
 from rply import LexerGenerator
 
 op_map = {

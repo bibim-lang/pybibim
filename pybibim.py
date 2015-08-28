@@ -1,3 +1,4 @@
+# coding=utf-8
 import sys
 import parser
 import lexer
@@ -87,8 +88,8 @@ def is_nextable_nn(number):
 
 
 def run_file(fn):
-    with open(fn, encoding='utf-8') as f:
-        code = f.read()
+    with open(fn) as f:
+        code = f.read().decode('utf-8')
         bowl = parse(code)
         run(bowl)
 

@@ -1,3 +1,4 @@
+# coding=utf-8
 import io
 import sys
 import pybibim
@@ -132,7 +133,7 @@ class Number(Value):
         """
         return Number(self._denominator)
 
-    def __bool__(self):
+    def __nonzero__(self):
         """ Number 값이 Number(0)일 경우 False를, 그 외의 경우에는 True를 반환합니다.
 
         만약 Bibim code의 논리 연산 및 비교 연산 결과가 필요할 때에는 이 method의 실행 결과를
@@ -224,7 +225,7 @@ class Number(Value):
                 return NULL_INST
         return self + (-other)
 
-    def __truediv__(self, other):
+    def __div__(self, other):
         """ 자신을 분자로 하고 other를 분모로 하는 새로운 Number를 생성합니다.
 
         :param other: 분모로 사용할 Number
@@ -499,7 +500,7 @@ class Bowl(Value):
         """ 문자열을 Bowl으로 변환합니다.
 
         :param s: 변환할 문자열
-        :type s: str
+        :type s: unicode
         :return: 생성된 Bowl
         :rtype: Bowl
         """
@@ -517,9 +518,9 @@ class Bowl(Value):
         :param bowl: 변환할 Bowl
         :type bowl: Bowl
         :return: 생성된 문자열
-        :rtype: str
+        :rtype: unicode
         """
-        result = ''
+        result = u''
         index = 0
         while True:
             try:
@@ -535,7 +536,7 @@ class Bowl(Value):
                 raise RuntimeError("Could not convert it to string, "
                                    "noodle value's denominator is not 1: %s"
                                    % (repr(noodle_value)))
-            result += chr(noodle_value.numerator)
+            result += unichr(noodle_value.numerator)
             index += 1
         return result
 
@@ -589,7 +590,7 @@ class Memory(Bowl):
 
     def __init__(self):
         """ 새로운 Memory을 생성합니다. """
-        super().__init__(None)
+        Bowl.__init__(self, None)
 
     def get_noodle(self, number):
         """ number를 noodle number로 가지는 Noodle을 반환합니다.
@@ -608,7 +609,7 @@ class Memory(Bowl):
             return Noodle(ValueExpr(Memory.NN_IO),
                           ValueExpr(Bowl.from_str(input_str)))
         else:
-            return super().get_noodle(number)
+            return Bowl.get_noodle(self, number)
 
     def set_noodle(self, number, value_expr):
         """ number를 noodle number로 가지는 Noodle의 expr를 변경합니다.
@@ -633,12 +634,12 @@ class Memory(Bowl):
                 raise RuntimeError("Could not print it as string, "
                                    "expr is not a Bowl: %s" % (
                                        repr(bowl_to_print)))
-            print(Bowl.to_str(bowl_to_print), end='')
+            print Bowl.to_str(bowl_to_print),
             return NULL_EXPR_INST
         elif number == Memory.NN_CURRENT_NOODLE:
             return NULL_EXPR_INST
         else:
-            return super().set_noodle(number, value_expr)
+            return Bowl.set_noodle(self, number, value_expr)
 
     def set_current_noodle_number(self, value_expr):
         """ 현재 noodle number를 지정합니다.
@@ -647,7 +648,7 @@ class Memory(Bowl):
         :return: NullExpr
         :rtype: NullExpr
         """
-        return super().set_noodle(Memory.NN_CURRENT_NOODLE, value_expr)
+        return Bowl.set_noodle(self, Memory.NN_CURRENT_NOODLE, value_expr)
 
     def __repr__(self):
         return "{" + "".join(repr(noodle) for noodle in self.wad.noodles) + "}"

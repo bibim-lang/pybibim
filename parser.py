@@ -1,3 +1,4 @@
+# coding=utf-8
 from rply import ParserGenerator, Token
 from expr_func import *
 from lexer import op_map
