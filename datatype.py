@@ -604,8 +604,7 @@ class Memory(Bowl):
         :rtype: Noodle
         """
         if number == Memory.NN_IO:
-            input_str = io.TextIOWrapper(sys.stdin.buffer,
-                                         encoding='utf-8').read()
+            input_str = sys.stdin.read().decode('utf-8')
             return Noodle(ValueExpr(Memory.NN_IO),
                           ValueExpr(Bowl.from_str(input_str)))
         else:
@@ -634,7 +633,7 @@ class Memory(Bowl):
                 raise RuntimeError("Could not print it as string, "
                                    "expr is not a Bowl: %s" % (
                                        repr(bowl_to_print)))
-            print Bowl.to_str(bowl_to_print),
+            sys.stdout.write(Bowl.to_str(bowl_to_print))
             return NULL_EXPR_INST
         elif number == Memory.NN_CURRENT_NOODLE:
             return NULL_EXPR_INST
