@@ -1,0 +1,23 @@
+version: "2"
+services:
+  helloworld:
+    build: .
+    volumes:
+      - ./pybibim:/pybibim
+      - ./testcode:/testcode
+  compile:
+    build: .
+    command: [pypy, /pypy/rpython/bin/rpython, /pybibim/pybibim.py]
+    volumes:
+      - ./pybibim:/pybibim
+  compile-jit:
+    build: .
+    command: [pypy, /pypy/rpython/bin/rpython, --opt=jit, /pybibim/pybibim.py]
+    volumes:
+      - ./pybibim:/pybibim
+  compiled-helloworld:
+    build: .
+    command: [/pybibim/pybibim-c, /testcode/helloworld.bibim]
+    volumes:
+      - ./pybibim:/pybibim
+      - ./testcode:/testcode

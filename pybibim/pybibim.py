@@ -1,4 +1,5 @@
 # coding=utf-8
+import os
 import sys
 import parser
 import lexer
@@ -87,17 +88,40 @@ def is_nextable_nn(number):
         return number > current_nn
 
 
-def run_file(fn):
-    with open(fn) as f:
-        code = f.read().decode('utf-8')
-        bowl = parse(code)
-        run(bowl)
+def run_file(fp):
+    code = ""
+    while True:
+        read = os.read(fp, 4096).decode('utf-8')
+        if len(read) == 0:
+            break
+        code += read
+    os.close(fp)
+    bowl = parse(code)
+    run(bowl)
 
+
+def entry_point(argv):
+    try:
+        filename = argv[1]
+    except IndexError:
+        print "You must supply a filename"
+        return 1
+
+    run_file(os.open(filename, os.O_RDONLY, 0777))
+    return 0
+
+
+def target(*args):
+    return entry_point, None
 
 if __name__ == "__main__":
-    argv = sys.argv
-    if len(argv) != 2:
-        print("You must supply a filename")
-    filename = argv[1]
+    entry_point(sys.argv)
 
-    run_file(filename)
+#
+# if __name__ == "__main__":
+#     argv = sys.argv
+#     if len(argv) != 2:
+#         print("You must supply a filename")
+#     filename = argv[1]
+#
+#     run_file(filename)
