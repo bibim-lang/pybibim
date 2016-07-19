@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-import sys
+from __future__ import absolute_import
+from rply.token import BaseBox
+
+from .io import read_data, write_data, STDIN, STDOUT
 from .mode import mode, MODE_DEBUG
 
 
-class Value:
+class Base(BaseBox):
+    """ Base class는 아무 역할도 하지 않습니다.
+
+    대신, 모든 Datatype의 부모 class로 동작하여 다형성을 유지합니다.
+    """
+
+    def __repr__(self):
+        return "Base"
+
+
+class Value(Base):
     """ Value class는 아무 역할도 하지 않습니다.
 
     대신, Null, Number, Bowl의 부모 class로 동작하여 다형성을 유지합니다.
     """
-    pass
+
+    def __repr__(self):
+        return "Value"
 
 
-class Expr:
+class Expr(Base):
     """ Expr class는 Bibim의 Expression 입니다. """
 
     def __init__(self, func):
@@ -29,7 +43,7 @@ class Expr:
         :return: 평가 결과
         :rtype: ValueExpr
         """
-        return self._func()
+        return self._func.call()
 
     def __repr__(self):
         return "Expr(%s)" % (repr(self._func),)
@@ -52,7 +66,6 @@ class ValueExpr(Expr):
         """
         return self
 
-    @property
     def value(self):
         """ 해당 ValueExpr의 value를 반환합니다.
 
@@ -104,7 +117,6 @@ class Number(Value):
             self._numerator = numerator // g
             self._denominator = denominator // g
 
-    @property
     def numerator(self):
         """ Number의 분자를 정수로 반환합니다.
 
@@ -113,7 +125,6 @@ class Number(Value):
         """
         return self._numerator
 
-    @property
     def denominator(self):
         """ Number의 분모를 정수로 반환합니다.
 
@@ -162,15 +173,15 @@ class Number(Value):
         """
         return Number.from_bool(bool(self))
 
-    def __neg__(self):
+    def neg(self):
         """ -number 값을 반환합니다.
 
         :return: 연산 결과
         :rtype: Number
         """
-        return Number(-self.numerator, self.denominator)
+        return Number(-self.numerator(), self.denominator())
 
-    def __mul__(self, other):
+    def mul(self, other):
         """ number와 other의 곱을 반환합니다.
 
         :param other: 곱할 Number
@@ -179,16 +190,17 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be calculated with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return NULL_INST
-        return Number(self.numerator * other.numerator,
-                      self.denominator * other.denominator)
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be calculated with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return NULL_INST
+            return NULL_INST
+        return Number(self.numerator() * other.numerator(),
+                      self.denominator() * other.denominator())
 
-    def __add__(self, other):
+    def add(self, other):
         """ number와 other의 합을 반환합니다.
 
         :param other: 더할 Number
@@ -197,18 +209,19 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be calculated with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return NULL_INST
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be calculated with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return NULL_INST
+            return NULL_INST
         return Number(
-            self._numerator * other.denominator
-            + self.denominator * other.numerator,
-            self.denominator * other.denominator)
+            self._numerator * other.denominator()
+            + self.denominator() * other.numerator(),
+            self.denominator() * other.denominator())
 
-    def __sub__(self, other):
+    def sub(self, other):
         """ number와 other의 차를 반환합니다.
 
         :param other: 뺄 Number
@@ -217,15 +230,16 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be calculated with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return NULL_INST
-        return self + (-other)
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be calculated with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return NULL_INST
+            return NULL_INST
+        return self.add(other.neg())
 
-    def __div__(self, other):
+    def div(self, other):
         """ 자신을 분자로 하고 other를 분모로 하는 새로운 Number를 생성합니다.
 
         :param other: 분모로 사용할 Number
@@ -234,16 +248,17 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be calculated with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return NULL_INST
-        return Number(self.numerator * other.denominator,
-                      self.denominator * other.numerator)
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be calculated with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return NULL_INST
+            return NULL_INST
+        return Number(self.numerator() * other.denominator(),
+                      self.denominator() * other.numerator())
 
-    def __and__(self, other):
+    def _and(self, other):
         """ 자신과 other가 모두 Number(0)이 아닌 경우는 Number(1)을, 그 외의
         경우에는 Number(0)을 반환합니다.
 
@@ -253,21 +268,22 @@ class Number(Value):
         :rtype: Number
         """
         if isinstance(other, Number):
-            if self.numerator != 0 and other.numerator != 0:
+            if self.numerator() != 0 and other.numerator() != 0:
                 return Number(1)
             else:
                 return Number(0)
         elif isinstance(other, Value):
             return Number(0)
         else:
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be calculated logically'
-                                     ' with a Value but %s is not a Value.' % (
-                                         repr(other),))
-            else:
-                return Number(0)
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be calculated logically'
+            #                          ' with a Value but %s is not a Value.' % (
+            #                              repr(other),))
+            # else:
+            #     return Number(0)
+            return Number(0)
 
-    def __or__(self, other):
+    def _or(self, other):
         """ 자신과 other가 모두 Number(0)인 경우는 Number(0)을, 그 외의
         경우에는 Number(1)을 반환합니다.
 
@@ -276,7 +292,7 @@ class Number(Value):
         :return: 연산 결과
         :rtype: Number
         """
-        if self.numerator != 0:
+        if self.numerator() != 0:
             return Number(1)
         else:
             if isinstance(other, Number):
@@ -284,14 +300,15 @@ class Number(Value):
             elif isinstance(other, Value):
                 return Number(0)
             else:
-                if mode == MODE_DEBUG:
-                    raise AssertionError('Numbers only can be calculated '
-                                         'logically with a Value but %s is '
-                                         'not a Value.' % (repr(other),))
-                else:
-                    return Number(0)
+                # if mode == MODE_DEBUG:
+                #     raise AssertionError('Numbers only can be calculated '
+                #                          'logically with a Value but %s is '
+                #                          'not a Value.' % (repr(other),))
+                # else:
+                #     return Number(0)
+                return Number(0)
 
-    def __lt__(self, other):
+    def lt(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
         반환합니다.
 
@@ -299,16 +316,17 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be compared with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return False
-        return self.numerator * other.denominator < \
-               other.numerator * self.denominator
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be compared with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return False
+            return False
+        return self.numerator() * other.denominator() < \
+               other.numerator() * self.denominator()
 
-    def __gt__(self, other):
+    def gt(self, other):
         """ 자신이 other보다 클 경우 True를, 그 외의 경우에는 False을
         반환합니다.
 
@@ -316,16 +334,17 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be compared with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return False
-        return self.numerator * other.denominator > \
-               other.numerator * self.denominator
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be compared with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return False
+            return False
+        return self.numerator() * other.denominator() > \
+               other.numerator() * self.denominator()
 
-    def __eq__(self, other):
+    def eq(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
         반환합니다.
 
@@ -333,14 +352,15 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if mode == MODE_DEBUG:
-                raise AssertionError('Numbers only can be compared with '
-                                     'a Number but %s is not a Number.' % (
-                                         repr(other),))
-            else:
-                return False
-        return self.numerator == other.numerator and \
-               self.denominator == other.denominator
+            # if mode == MODE_DEBUG:
+            #     raise AssertionError('Numbers only can be compared with '
+            #                          'a Number but %s is not a Number.' % (
+            #                              repr(other),))
+            # else:
+            #     return False
+            return False
+        return self.numerator() == other.numerator() and \
+               self.denominator() == other.denominator()
 
     def not_f(self):
         """ 자신이 Number(0)이면 Number(1)을, 그 외의 경우에는 Number(0)을
@@ -359,7 +379,7 @@ class Number(Value):
         :return: 비교 결과
         :rtype: Number
         """
-        return Number.from_bool(self == other)
+        return Number.from_bool(self.eq(other))
 
     def gt_f(self, other):
         """ 자신이 other보다 크면 Number(1)을, 작거나 같으면 Number(0)을
@@ -370,7 +390,7 @@ class Number(Value):
         :return: 비교 결과
         :rtype: Number
         """
-        return Number.from_bool(self > other)
+        return Number.from_bool(self.gt(other))
 
     def lt_f(self, other):
         """ 자신이 other보다 작으면 Number(1)을, 크거나 같으면 Number(0)을
@@ -381,7 +401,7 @@ class Number(Value):
         :return: 비교 결과
         :rtype: Number
         """
-        return Number.from_bool(self < other)
+        return Number.from_bool(self.lt(other))
 
     def __repr__(self):
         if self._denominator == 1:
@@ -390,7 +410,7 @@ class Number(Value):
             return "%d/%d" % (self._numerator, self._denominator)
 
 
-class Noodle:
+class Noodle(Base):
     """ Wad에 담길 Noodle class입니다. """
 
     def __init__(self, nn_expr, expr):
@@ -404,7 +424,6 @@ class Noodle:
         self._nn_expr = nn_expr
         self._expr = expr
 
-    @property
     def nn_expr(self):
         """ Noodle의 noodle number를 반환합니다.
 
@@ -413,7 +432,6 @@ class Noodle:
         """
         return self._nn_expr
 
-    @property
     def expr(self):
         """ Noodle의 Expr을 반환합니다.
 
@@ -432,10 +450,10 @@ class Noodle:
         return NULL_EXPR_INST
 
     def __repr__(self):
-        return "[%s; %s]" % (repr(self.nn_expr), repr(self._expr))
+        return "[%s; %s]" % (repr(self.nn_expr()), repr(self._expr))
 
 
-class Wad:
+class Wad(Base):
     """ Bowl의 Noodle들을 담고 있는 class입니다. """
 
     def __init__(self, noodle):
@@ -448,9 +466,8 @@ class Wad:
         if noodle:
             self._noodles = [noodle]
         else:
-            self._noodles = list()
+            self._noodles = []
 
-    @property
     def noodles(self):
         """ noodles를 반환합니다.
 
@@ -486,7 +503,6 @@ class Bowl(Value):
         else:
             self._wad = Wad(None)
 
-    @property
     def wad(self):
         """ wad를 반환합니다.
 
@@ -508,7 +524,7 @@ class Bowl(Value):
         noodle_num = Number(0)
         for c in s:
             wad.put(Noodle(ValueExpr(noodle_num), ValueExpr(Number(ord(c)))))
-            noodle_num = noodle_num + Number(1)
+            noodle_num = noodle_num.add(Number(1))
         return Bowl(wad)
 
     @staticmethod
@@ -527,16 +543,16 @@ class Bowl(Value):
                 noodle = bowl.get_noodle(Number(index, 1))
             except KeyError:
                 break
-            noodle_value = noodle.expr.eval().value
-            if not isinstance(noodle_value, Number):
-                raise RuntimeError("Could not convert it to string, "
-                                   "noodle value is not a Number: %s" % (
-                                       repr(noodle_value)))
-            elif noodle_value.denominator != 1:
-                raise RuntimeError("Could not convert it to string, "
-                                   "noodle value's denominator is not 1: %s"
-                                   % (repr(noodle_value)))
-            result += unichr(noodle_value.numerator)
+            noodle_value = noodle.expr().eval().value()
+            # if not isinstance(noodle_value, Number):
+            #     raise RuntimeError("Could not convert it to string, "
+            #                        "noodle value is not a Number: %s" % (
+            #                            repr(noodle_value)))
+            # elif noodle_value.denominator() != 1:
+            #     raise RuntimeError("Could not convert it to string, "
+            #                        "noodle value's denominator is not 1: %s"
+            #                        % (repr(noodle_value)))
+            result += unichr(noodle_value.numerator())
             index += 1
         return result
 
@@ -548,12 +564,12 @@ class Bowl(Value):
         :return: 해당 Noodle
         :rtype: Noodle
         """
-        for noodle in self.wad.noodles:
-            nn = noodle.nn_expr.eval().value
-            if not isinstance(nn, Number):
-                raise AssertionError("Noodle numbers must be a Number. %s is "
-                                     "not a Number" % (repr(nn),))
-            if nn == number:
+        for noodle in self.wad().noodles():
+            nn = noodle.nn_expr().eval().value()
+            # if not isinstance(nn, Number):
+            #     raise AssertionError("Noodle numbers must be a Number. %s is "
+            #                          "not a Number" % (repr(nn),))
+            if nn.eq(number):
                 return noodle
         raise KeyError("Cannot found the noodle")
 
@@ -567,15 +583,15 @@ class Bowl(Value):
         :return: NullExpr
         :rtype: NullExpr
         """
-        for noodle in self.wad.noodles:
-            nn = noodle.nn_expr.eval().value
-            if not isinstance(nn, Number):
-                raise AssertionError("Noodle numbers must be a Number. %s is "
-                                     "not a Number" % (repr(nn),))
-            if nn == number:
+        for noodle in self.wad().noodles():
+            nn = noodle.nn_expr().eval().value()
+            # if not isinstance(nn, Number):
+            #     raise AssertionError("Noodle numbers must be a Number. %s is "
+            #                          "not a Number" % (repr(nn),))
+            if nn.eq(number):
                 noodle.set_expr(value_expr)
                 return NULL_EXPR_INST
-        self.wad.put(Noodle(ValueExpr(number), value_expr))
+        self.wad().put(Noodle(ValueExpr(number), value_expr))
         return NULL_EXPR_INST
 
     def __repr__(self):
@@ -603,8 +619,8 @@ class Memory(Bowl):
         :return: 해당 Noodle
         :rtype: Noodle
         """
-        if number == Memory.NN_IO:
-            input_str = sys.stdin.read().decode('utf-8')
+        if number.eq(Memory.NN_IO):
+            input_str = read_data(STDIN)
             return Noodle(ValueExpr(Memory.NN_IO),
                           ValueExpr(Bowl.from_str(input_str)))
         else:
@@ -627,15 +643,15 @@ class Memory(Bowl):
         :return: NullExpr
         :rtype: NullExpr
         """
-        if number == Memory.NN_IO:
-            bowl_to_print = value_expr.value
-            if not isinstance(bowl_to_print, Bowl):
-                raise RuntimeError("Could not print it as string, "
-                                   "expr is not a Bowl: %s" % (
-                                       repr(bowl_to_print)))
-            sys.stdout.write(Bowl.to_str(bowl_to_print))
+        if number.eq(Memory.NN_IO):
+            bowl_to_print = value_expr.value()
+            # if not isinstance(bowl_to_print, Bowl):
+            #     raise RuntimeError("Could not print it as string, "
+            #                        "expr is not a Bowl: %s" % (
+            #                            repr(bowl_to_print)))
+            write_data(STDOUT, Bowl.to_str(bowl_to_print))
             return NULL_EXPR_INST
-        elif number == Memory.NN_CURRENT_NOODLE:
+        elif number.eq(Memory.NN_CURRENT_NOODLE):
             return NULL_EXPR_INST
         else:
             return Bowl.set_noodle(self, number, value_expr)
@@ -650,7 +666,7 @@ class Memory(Bowl):
         return Bowl.set_noodle(self, Memory.NN_CURRENT_NOODLE, value_expr)
 
     def __repr__(self):
-        return "{" + "".join(repr(noodle) for noodle in self.wad.noodles) + "}"
+        return "{" + "".join(repr(noodle) for noodle in self.wad().noodles()) + "}"
 
 
 NULL_INST = Null()

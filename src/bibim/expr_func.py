@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
+
 from . import datatype
 from .utils import safe_get_value, safe_get_evaled_expr
 
@@ -10,7 +11,7 @@ class Func:
     세부적인 동작은 해당 class를 상속받은 class에서 정의합니다.
     """
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -33,7 +34,7 @@ class FuncBowl(Func):
         self.bowl = bowl
         self.nn = nn
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -46,7 +47,7 @@ class FuncBowl(Func):
         if nn is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
         try:
-            return safe_get_evaled_expr(bowl.get_noodle(nn).expr)
+            return safe_get_evaled_expr(bowl.get_noodle(nn).expr())
         except KeyError:
             return datatype.NULL_EXPR_INST
 
@@ -72,7 +73,7 @@ class FuncAssign(Func):
         self.nn = nn
         self.value_expr = value_expr
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -100,7 +101,7 @@ class FuncDeno(Func):
         """
         self.number = number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -126,7 +127,7 @@ class FuncPlus(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -138,7 +139,7 @@ class FuncPlus(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number + r_number)
+        return datatype.ValueExpr(l_number.add(r_number))
 
 
 class FuncMinus(Func):
@@ -155,7 +156,7 @@ class FuncMinus(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -167,7 +168,7 @@ class FuncMinus(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number - r_number)
+        return datatype.ValueExpr(l_number.sub(r_number))
 
 
 class FuncMul(Func):
@@ -184,7 +185,7 @@ class FuncMul(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -196,7 +197,7 @@ class FuncMul(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number * r_number)
+        return datatype.ValueExpr(l_number.mul(r_number))
 
 
 class FuncNumberSep(Func):
@@ -213,7 +214,7 @@ class FuncNumberSep(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -225,7 +226,7 @@ class FuncNumberSep(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number / r_number)
+        return datatype.ValueExpr(l_number.div(r_number))
 
 
 class FuncAnd(Func):
@@ -242,7 +243,7 @@ class FuncAnd(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -254,7 +255,7 @@ class FuncAnd(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number and r_number)
+        return datatype.ValueExpr(l_number._and(r_number))
 
 
 class FuncOr(Func):
@@ -271,7 +272,7 @@ class FuncOr(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -283,7 +284,7 @@ class FuncOr(Func):
         r_number = safe_get_value(self.r_number, datatype.Number)
         if r_number is datatype.NULL_INST:
             return datatype.NULL_EXPR_INST
-        return datatype.ValueExpr(l_number or r_number)
+        return datatype.ValueExpr(l_number._or(r_number))
 
 
 class FuncNot(Func):
@@ -297,7 +298,7 @@ class FuncNot(Func):
         """
         self.number = number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -323,7 +324,7 @@ class FuncEq(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -352,7 +353,7 @@ class FuncGt(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과
@@ -381,7 +382,7 @@ class FuncLt(Func):
         self.l_number = l_number
         self.r_number = r_number
 
-    def __call__(self):
+    def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
         :return: 평가된 결과

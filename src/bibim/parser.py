@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 
 from rply import ParserGenerator, Token
 from .expr_func import *
@@ -81,25 +81,32 @@ def expr_parans(p):
     return expr
 
 
-@pg.production('expr : MEM BOWL expr ASSIGN expr', precedence='ass_expr')
 @pg.production('expr : expr BOWL expr ASSIGN expr', precedence='ass_expr')
+def expr_assign(p):
+    bowl = p[0]
+    nn = p[2]
+    value_expr = p[4]
+    return datatype.Expr(FuncAssign(bowl=bowl, nn=nn, value_expr=value_expr))
+
+
+@pg.production('expr : MEM BOWL expr ASSIGN expr', precedence='ass_expr')
 def expr_assign_m(p):
-    if type(p[0]) is Token and p[0].gettokentype() == 'MEM':
-        bowl = datatype.ValueExpr(datatype.MEM)
-    else:
-        bowl = p[0]
+    bowl = datatype.ValueExpr(datatype.MEM)
     nn = p[2]
     value_expr = p[4]
     return datatype.Expr(FuncAssign(bowl=bowl, nn=nn, value_expr=value_expr))
 
 
 @pg.production('expr : expr BOWL expr')
-@pg.production('expr : MEM BOWL expr')
 def expr_bowl_get(p):
-    if type(p[0]) is Token and p[0].gettokentype() == 'MEM':
-        bowl = datatype.ValueExpr(datatype.MEM)
-    else:
-        bowl = p[0]
+    bowl = p[0]
+    nn = p[2]
+    return datatype.Expr(FuncBowl(bowl=bowl, nn=nn))
+
+
+@pg.production('expr : MEM BOWL expr')
+def expr_bowl_get_m(p):
+    bowl = datatype.ValueExpr(datatype.MEM)
     nn = p[2]
     return datatype.Expr(FuncBowl(bowl=bowl, nn=nn))
 

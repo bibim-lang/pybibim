@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import
 
 import os
 
 from .parser import parser
 from .lexer import lexer
 from . import datatype
+from .io import read_data
 from .utils import safe_get_value
 
 
@@ -31,8 +32,8 @@ def run(bowl_inst):
     datatype.MEM.set_current_noodle_number(datatype.NULL_EXPR_INST)
     current_noodle = get_next_noodle(bowl_inst)
     while current_noodle is not None:
-        datatype.MEM.set_current_noodle_number(current_noodle.nn_expr.eval())
-        current_noodle.expr.eval()
+        datatype.MEM.set_current_noodle_number(current_noodle.nn_expr().eval())
+        current_noodle.expr().eval()
         current_noodle = get_next_noodle(bowl_inst)
 
 
@@ -48,14 +49,14 @@ def get_next_noodle(bowl_inst):
     """
     min_noodle = None
     min_noodle_value = None
-    for noodle in bowl_inst.wad.noodles:
-        nn = safe_get_value(noodle.nn_expr, datatype.Number)
+    for noodle in bowl_inst.wad().noodles():
+        nn = safe_get_value(noodle.nn_expr(), datatype.Number)
         if nn is datatype.NULL_INST:
             continue
         if is_nextable_nn(nn):
-            if min_noodle is None or nn < min_noodle_value:
+            if min_noodle is None or nn.lt(min_noodle_value):
                 min_noodle = noodle
-                min_noodle_value = min_noodle.nn_expr.eval().value
+                min_noodle_value = min_noodle.nn_expr().eval().value()
     return min_noodle
 
 
@@ -78,20 +79,15 @@ def is_nextable_nn(number):
             datatype.Memory.NN_CURRENT_NOODLE)
     except KeyError:
         return False
-    current_nn = safe_get_value(current_noodle.expr, datatype.Number)
+    current_nn = safe_get_value(current_noodle.expr(), datatype.Number)
     if current_nn is datatype.NULL_INST:
-        return number.numerator >= 0
+        return number.numerator() >= 0
     else:
-        return number > current_nn
+        return number.gt(current_nn)
 
 
 def run_file(fp):
-    code = ""
-    while True:
-        read = os.read(fp, 4096).decode('utf-8')
-        if len(read) == 0:
-            break
-        code += read
+    code = read_data(fp)
     os.close(fp)
     bowl = parse(code)
     run(bowl)
