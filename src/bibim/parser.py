@@ -31,7 +31,7 @@ pg = ParserGenerator(
 
 
 @pg.production('bowl : BOWL_OPEN BOWL_CLOSE')
-def bowl_empty(p):
+def bowl_empty(_):
     return datatype.Bowl(None)
 
 
@@ -57,15 +57,15 @@ def noodle(p):
 
 @pg.production('wad : noodle')
 def wad_single(p):
-    noodle = p[0]
-    return datatype.Wad(noodle)
+    _noodle = p[0]
+    return datatype.Wad(_noodle)
 
 
 @pg.production('wad : wad noodle')
 def wad_put(p):
     wad = p[0]
-    noodle = p[1]
-    return wad.put(noodle)
+    _noodle = p[1]
+    return wad.put(_noodle)
 
 
 @pg.production('expr : number')
@@ -106,8 +106,8 @@ def expr_bowl_get(p):
 
 @pg.production('expr : DENO expr')
 def expr_deno(p):
-    number = p[1]
-    return datatype.Expr(FuncDeno(number=number))
+    _number = p[1]
+    return datatype.Expr(FuncDeno(number=_number))
 
 
 @pg.production('expr : expr PLUS expr')
@@ -154,8 +154,8 @@ def expr_or(p):
 
 @pg.production('expr : NOT expr')
 def expr_not(p):
-    number = p[1]
-    return datatype.Expr(FuncNot(number=number))
+    _number = p[1]
+    return datatype.Expr(FuncNot(number=_number))
 
 
 @pg.production('expr : expr EQ expr')
