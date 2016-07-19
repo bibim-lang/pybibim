@@ -100,5 +100,10 @@ def entry_point(argv):
         print("You must supply a filename")
         return 1
 
+    import time
+    start_time = time.time()
+
     run_file(os.open(filename, os.O_RDONLY, 0o777))
+
+    print("runtime: %s sec" % (time.time() - start_time))
     return 0
