@@ -11,4 +11,4 @@ WORKDIR /src
 ADD requirements.txt /src
 RUN pip install -r requirements.txt
 
-CMD [ "pypy", "/src/pybibim.py", "/testcode/helloworld.bibim"]
+CMD ["pypy", "/src/pybibim.py", "/testcode/helloworld.bibim"]

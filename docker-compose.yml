@@ -5,6 +5,12 @@ services:
     volumes:
       - ./src:/src
       - ./testcode:/testcode
+  fizz:
+    build: .
+    volumes:
+      - ./src:/src
+      - ./testcode:/testcode
+    command: [pypy, /src/pybibim.py, /testcode/fizzbuzz_with_number_comment.bibim]
   compile:
     build: .
     command: [pypy, /pypy/rpython/bin/rpython, /src/pybibim.py]
@@ -18,6 +24,12 @@ services:
   compiled-helloworld:
     build: .
     command: [/src/pybibim-c, /testcode/helloworld.bibim]
+    volumes:
+      - ./src:/src
+      - ./testcode:/testcode
+  compiled-fizz:
+    build: .
+    command: [/src/pybibim-c, /testcode/fizzbuzz_with_number_comment.bibim]
     volumes:
       - ./src:/src
       - ./testcode:/testcode
