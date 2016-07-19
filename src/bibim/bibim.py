@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, absolute_import
 
 import os
-import sys
 
 from .parser import parser
 from .lexer import lexer
@@ -107,11 +106,3 @@ def entry_point(argv):
 
     run_file(os.open(filename, os.O_RDONLY, 0o777))
     return 0
-
-
-def target(*args):
-    return entry_point, None
-
-
-if __name__ == "__main__":
-    entry_point(sys.argv)
