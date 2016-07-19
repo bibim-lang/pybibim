@@ -17,7 +17,7 @@ services:
       - ./src:/src
   compiled-helloworld:
     build: .
-    command: [/src/pybibim.py, /testcode/helloworld.bibim]
+    command: [/src/pybibim-c, /testcode/helloworld.bibim]
     volumes:
       - ./src:/src
       - ./testcode:/testcode
