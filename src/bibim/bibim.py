@@ -1,15 +1,13 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
+
 import os
 import sys
-import parser
-import lexer
-import datatype
-from utils import safe_get_value
 
-MODE_NORMAL = 1
-MODE_DEBUG = 2
-
-mode = MODE_DEBUG
+from .parser import parser
+from .lexer import lexer
+from . import datatype
+from .utils import safe_get_value
 
 
 def parse(code_string):
@@ -20,7 +18,7 @@ def parse(code_string):
     :return: 파싱된 결과.
     :rtype: datatime.Value|datatime.Expr|datatime.Noodle
     """
-    return parser.parser.parse(lexer.lexer.lex(code_string))
+    return parser.parse(lexer.lex(code_string))
 
 
 def run(bowl_inst):
@@ -104,24 +102,16 @@ def entry_point(argv):
     try:
         filename = argv[1]
     except IndexError:
-        print "You must supply a filename"
+        print("You must supply a filename")
         return 1
 
-    run_file(os.open(filename, os.O_RDONLY, 0777))
+    run_file(os.open(filename, os.O_RDONLY, 0o777))
     return 0
 
 
 def target(*args):
     return entry_point, None
 
+
 if __name__ == "__main__":
     entry_point(sys.argv)
-
-#
-# if __name__ == "__main__":
-#     argv = sys.argv
-#     if len(argv) != 2:
-#         print("You must supply a filename")
-#     filename = argv[1]
-#
-#     run_file(filename)

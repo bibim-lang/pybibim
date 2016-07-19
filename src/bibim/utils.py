@@ -1,6 +1,7 @@
-# coding=utf-8
-import pybibim
-import datatype
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
+from .mode import mode, MODE_DEBUG
+from . import datatype
 
 
 def filtered_str(string):
@@ -8,7 +9,7 @@ def filtered_str(string):
 
 
 def safe_get_evaled_expr(expr):
-    if pybibim.mode == pybibim.MODE_DEBUG:
+    if mode == MODE_DEBUG:
         assert isinstance(expr, datatype.Expr), \
             "expr is must be an Expr but expr is not an Expr: %s" \
             % (repr(expr),)
@@ -25,7 +26,7 @@ def safe_get_evaled_expr(expr):
 
 
 def safe_get_value(expr, cls=None, is_null_ok=True):
-    if pybibim.mode == pybibim.MODE_DEBUG:
+    if mode == MODE_DEBUG:
         value = safe_get_evaled_expr(expr).value
         is_null = value is datatype.NULL_INST
         if is_null and not is_null_ok:

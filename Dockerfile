@@ -5,10 +5,10 @@ RUN set -x \
     && curl -SL "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.1-src.tar.bz2" \
         | tar -xjC /pypy --strip-components=1
 
-RUN mkdir -p /pybibim
-WORKDIR /pybibim
+RUN mkdir -p /src
+WORKDIR /src
 
-ADD requirements.txt /pybibim
+ADD requirements.txt /src
 RUN pip install -r requirements.txt
 
-CMD [ "pypy", "/pybibim/pybibim.py", "/testcode/helloworld.bibim"]
+CMD [ "pypy", "/src/pybibim.py", "/testcode/helloworld.bibim"]

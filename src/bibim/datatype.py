@@ -1,7 +1,8 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
 import io
 import sys
-import pybibim
+from .mode import mode, MODE_DEBUG
 
 
 class Value:
@@ -179,7 +180,7 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be calculated with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -197,7 +198,7 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be calculated with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -217,7 +218,7 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be calculated with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -234,7 +235,7 @@ class Number(Value):
         :rtype: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be calculated with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -260,7 +261,7 @@ class Number(Value):
         elif isinstance(other, Value):
             return Number(0)
         else:
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be calculated logically'
                                      ' with a Value but %s is not a Value.' % (
                                          repr(other),))
@@ -284,7 +285,7 @@ class Number(Value):
             elif isinstance(other, Value):
                 return Number(0)
             else:
-                if pybibim.mode == pybibim.MODE_DEBUG:
+                if mode == MODE_DEBUG:
                     raise AssertionError('Numbers only can be calculated '
                                          'logically with a Value but %s is '
                                          'not a Value.' % (repr(other),))
@@ -299,7 +300,7 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be compared with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -316,7 +317,7 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be compared with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))
@@ -333,7 +334,7 @@ class Number(Value):
         :type other: Number
         """
         if not isinstance(other, Number):
-            if pybibim.mode == pybibim.MODE_DEBUG:
+            if mode == MODE_DEBUG:
                 raise AssertionError('Numbers only can be compared with '
                                      'a Number but %s is not a Number.' % (
                                          repr(other),))

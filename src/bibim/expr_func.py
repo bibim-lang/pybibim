@@ -1,6 +1,7 @@
-# coding=utf-8
-import datatype
-from utils import safe_get_value, safe_get_evaled_expr
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
+from . import datatype
+from .utils import safe_get_value, safe_get_evaled_expr
 
 
 class Func:

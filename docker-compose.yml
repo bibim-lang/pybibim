@@ -3,21 +3,21 @@ services:
   helloworld:
     build: .
     volumes:
-      - ./pybibim:/pybibim
+      - ./src:/src
       - ./testcode:/testcode
   compile:
     build: .
-    command: [pypy, /pypy/rpython/bin/rpython, /pybibim/pybibim.py]
+    command: [pypy, /pypy/rpython/bin/rpython, /src/pybibim.py]
     volumes:
-      - ./pybibim:/pybibim
+      - ./src:/src
   compile-jit:
     build: .
-    command: [pypy, /pypy/rpython/bin/rpython, --opt=jit, /pybibim/pybibim.py]
+    command: [pypy, /pypy/rpython/bin/rpython, --opt=jit, /src/pybibim.py]
     volumes:
-      - ./pybibim:/pybibim
+      - ./src:/src
   compiled-helloworld:
     build: .
-    command: [/pybibim/pybibim-c, /testcode/helloworld.bibim]
+    command: [/src/pybibim.py, /testcode/helloworld.bibim]
     volumes:
-      - ./pybibim:/pybibim
+      - ./src:/src
       - ./testcode:/testcode
