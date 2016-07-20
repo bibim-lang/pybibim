@@ -13,23 +13,23 @@ services:
     command: [pypy, /src/pybibim.py, /testcode/fizzbuzz_with_number_comment.bibim]
   compile:
     build: .
-    command: [pypy, /pypy/rpython/bin/rpython, /src/pybibim.py]
+    command: [pypy, /pypy/rpython/bin/rpython, --output=bbm, /src/pybibim.py]
     volumes:
       - ./src:/src
   compile-jit:
     build: .
-    command: [pypy, /pypy/rpython/bin/rpython, --opt=jit, /src/pybibim.py]
+    command: [pypy, /pypy/rpython/bin/rpython, --output=bbm, --opt=jit, /src/pybibim.py]
     volumes:
       - ./src:/src
   compiled-helloworld:
     build: .
-    command: [/src/pybibim-c, /testcode/helloworld.bibim]
+    command: [/src/bbm, /testcode/helloworld.bibim]
     volumes:
       - ./src:/src
       - ./testcode:/testcode
   compiled-fizz:
     build: .
-    command: [/src/pybibim-c, /testcode/fizzbuzz_with_number_comment.bibim]
+    command: [/src/bbm, /testcode/fizzbuzz_with_number_comment.bibim]
     volumes:
       - ./src:/src
       - ./testcode:/testcode
