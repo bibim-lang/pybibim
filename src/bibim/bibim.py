@@ -9,6 +9,27 @@ from . import datatype
 from .io import read_data
 from .utils import safe_get_value
 
+try:
+    from rpython.rlib.jit import JitDriver
+except ImportError:
+    class JitDriver(object):
+        def __init__(self, **kw): pass
+
+        def jit_merge_point(self, **kw): pass
+
+        def can_enter_jit(self, **kw): pass
+
+jitdriver = JitDriver(
+    greens=[
+        'current_noodle',
+        'bowl'
+    ],
+    reds=[
+        # 'mem'
+    ],
+    is_recursive=True
+)
+
 
 def parse(code_string):
     """ code_string을 파싱한 결과를 반환합니다.
@@ -32,6 +53,11 @@ def run(bowl_inst):
     datatype.MEM.set_current_noodle_number(datatype.NULL_EXPR_INST)
     current_noodle = get_next_noodle(bowl_inst)
     while current_noodle is not None:
+        jitdriver.jit_merge_point(
+            current_noodle=current_noodle,
+            bowl=bowl_inst,
+            # mem=datatype.MEM
+        )
         datatype.MEM.set_current_noodle_number(current_noodle.nn_expr().eval())
         current_noodle.expr().eval()
         current_noodle = get_next_noodle(bowl_inst)
