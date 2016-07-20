@@ -1,4 +1,5 @@
 .idea
+.python-version
 __pycache__
 *.pyc
 src/pybibim-c
