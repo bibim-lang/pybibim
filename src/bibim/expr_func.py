@@ -19,6 +19,9 @@ class Func:
         """
         return datatype.NULL_EXPR_INST
 
+    def log_string(self):
+        return "Func"
+
 
 class FuncBowl(Func):
     """ bowl operator ':'의 동작을 정의하는 class입니다. """
@@ -33,6 +36,9 @@ class FuncBowl(Func):
         """
         self.bowl = bowl
         self.nn = nn
+
+    def log_string(self):
+        return "FuncBowl(%s, %s)" % (self.bowl.log_string(), self.nn.log_string())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -73,6 +79,9 @@ class FuncAssign(Func):
         self.nn = nn
         self.value_expr = value_expr
 
+    def log_string(self):
+        return "FuncAssign(%s, %s, %s)" % (self.bowl.log_string(), self.nn.log_string(), self.value_expr.log_string())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -101,6 +110,9 @@ class FuncDeno(Func):
         """
         self.number = number
 
+    def log_string(self):
+        return "FuncDeno(%s)" % (self.number.log_string(), )
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -126,6 +138,9 @@ class FuncPlus(Func):
         """
         self.l_number = l_number
         self.r_number = r_number
+
+    def log_string(self):
+        return "FuncPlus(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -156,6 +171,9 @@ class FuncMinus(Func):
         self.l_number = l_number
         self.r_number = r_number
 
+    def log_string(self):
+        return "FuncMinus(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -184,6 +202,9 @@ class FuncMul(Func):
         """
         self.l_number = l_number
         self.r_number = r_number
+
+    def log_string(self):
+        return "FuncMul(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -243,6 +264,9 @@ class FuncAnd(Func):
         self.l_number = l_number
         self.r_number = r_number
 
+    def log_string(self):
+        return "FuncAnd(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -272,6 +296,9 @@ class FuncOr(Func):
         self.l_number = l_number
         self.r_number = r_number
 
+    def log_string(self):
+        return "FuncOr(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -298,6 +325,9 @@ class FuncNot(Func):
         """
         self.number = number
 
+    def log_string(self):
+        return "FuncNot(%s)" % (self.number.log_string(), )
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -323,6 +353,9 @@ class FuncEq(Func):
         """
         self.l_number = l_number
         self.r_number = r_number
+
+    def log_string(self):
+        return "FuncEq(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -353,6 +386,9 @@ class FuncGt(Func):
         self.l_number = l_number
         self.r_number = r_number
 
+    def log_string(self):
+        return "FuncGt(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -381,6 +417,9 @@ class FuncLt(Func):
         """
         self.l_number = l_number
         self.r_number = r_number
+
+    def log_string(self):
+        return "FuncLt(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.

@@ -11,7 +11,7 @@ class Base(BaseBox):
     대신, 모든 Datatype의 부모 class로 동작하여 다형성을 유지합니다.
     """
 
-    def __repr__(self):
+    def log_string(self):
         return "Base"
 
 
@@ -21,7 +21,7 @@ class Value(Base):
     대신, Null, Number, Bowl의 부모 class로 동작하여 다형성을 유지합니다.
     """
 
-    def __repr__(self):
+    def log_string(self):
         return "Value"
 
 
@@ -44,8 +44,8 @@ class Expr(Base):
         """
         return self._func.call()
 
-    def __repr__(self):
-        return "Expr(%s)" % (repr(self._func),)
+    def log_string(self):
+        return "Expr(%s)" % (self._func.log_string(),)
 
 
 class ValueExpr(Expr):
@@ -73,14 +73,14 @@ class ValueExpr(Expr):
         """
         return self._value
 
-    def __repr__(self):
-        return "ValueExpr(%s)" % (repr(self._value))
+    def log_string(self):
+        return "ValueExpr(%s)" % (self._value.log_string())
 
 
 class Null(Value):
     """ 정의되지 않은 값을 가지는 Value입니다."""
 
-    def __repr__(self):
+    def log_string(self):
         return "Null"
 
 
@@ -192,7 +192,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return NULL_INST
             return NULL_INST
@@ -211,7 +211,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return NULL_INST
             return NULL_INST
@@ -232,7 +232,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return NULL_INST
             return NULL_INST
@@ -250,7 +250,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return NULL_INST
             return NULL_INST
@@ -277,7 +277,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated logically'
             #                          ' with a Value but %s is not a Value.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return Number(0)
             return Number(0)
@@ -302,7 +302,7 @@ class Number(Value):
                 # if mode == MODE_DEBUG:
                 #     raise AssertionError('Numbers only can be calculated '
                 #                          'logically with a Value but %s is '
-                #                          'not a Value.' % (repr(other),))
+                #                          'not a Value.' % (other.log_string(),))
                 # else:
                 #     return Number(0)
                 return Number(0)
@@ -318,7 +318,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be compared with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return False
             return False
@@ -336,7 +336,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be compared with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return False
             return False
@@ -354,7 +354,7 @@ class Number(Value):
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be compared with '
             #                          'a Number but %s is not a Number.' % (
-            #                              repr(other),))
+            #                              other.log_string(),))
             # else:
             #     return False
             return False
@@ -402,7 +402,7 @@ class Number(Value):
         """
         return Number.from_bool(self.lt(other))
 
-    def __repr__(self):
+    def log_string(self):
         if self._denominator == 1:
             return "%d" % (self._numerator,)
         else:
@@ -448,8 +448,8 @@ class Noodle(Base):
         self._expr = expr
         return NULL_EXPR_INST
 
-    def __repr__(self):
-        return "[%s; %s]" % (repr(self.nn_expr()), repr(self._expr))
+    def log_string(self):
+        return "[%s; %s]" % (self.nn_expr().log_string(), self._expr.log_string())
 
 
 class Wad(Base):
@@ -484,8 +484,11 @@ class Wad(Base):
         self._noodles.append(noodle)
         return self
 
-    def __repr__(self):
-        return "".join(repr(noodle) for noodle in self._noodles)
+    def log_string(self):
+        result = ""
+        for noodle in self._noodles:
+            result += noodle.log_string()
+        return result
 
 
 class Bowl(Value):
@@ -546,11 +549,11 @@ class Bowl(Value):
             # if not isinstance(noodle_value, Number):
             #     raise RuntimeError("Could not convert it to string, "
             #                        "noodle value is not a Number: %s" % (
-            #                            repr(noodle_value)))
+            #                            noodle_value.log_string()))
             # elif noodle_value.denominator() != 1:
             #     raise RuntimeError("Could not convert it to string, "
             #                        "noodle value's denominator is not 1: %s"
-            #                        % (repr(noodle_value)))
+            #                        % (noodle_value.log_string()))
             result += unichr(noodle_value.numerator())
             index += 1
         return result
@@ -567,7 +570,7 @@ class Bowl(Value):
             nn = noodle.nn_expr().eval().value()
             # if not isinstance(nn, Number):
             #     raise AssertionError("Noodle numbers must be a Number. %s is "
-            #                          "not a Number" % (repr(nn),))
+            #                          "not a Number" % (nn.log_string(),))
             if nn.eq(number):
                 return noodle
         raise KeyError("Cannot found the noodle")
@@ -586,15 +589,15 @@ class Bowl(Value):
             nn = noodle.nn_expr().eval().value()
             # if not isinstance(nn, Number):
             #     raise AssertionError("Noodle numbers must be a Number. %s is "
-            #                          "not a Number" % (repr(nn),))
+            #                          "not a Number" % (nn.log_string(),))
             if nn.eq(number):
                 noodle.set_expr(value_expr)
                 return NULL_EXPR_INST
         self.wad().put(Noodle(ValueExpr(number), value_expr))
         return NULL_EXPR_INST
 
-    def __repr__(self):
-        return "{%s}" % (repr(self._wad),)
+    def log_string(self):
+        return "{%s}" % (self._wad.log_string(),)
 
 
 class Memory(Bowl):
@@ -647,7 +650,7 @@ class Memory(Bowl):
             # if not isinstance(bowl_to_print, Bowl):
             #     raise RuntimeError("Could not print it as string, "
             #                        "expr is not a Bowl: %s" % (
-            #                            repr(bowl_to_print)))
+            #                            bowl_to_print.log_string()))
             write_data(STDOUT, Bowl.to_str(bowl_to_print))
             return NULL_EXPR_INST
         elif number.eq(Memory.NN_CURRENT_NOODLE):
@@ -664,8 +667,11 @@ class Memory(Bowl):
         """
         return Bowl.set_noodle(self, Memory.NN_CURRENT_NOODLE, value_expr)
 
-    def __repr__(self):
-        return "{" + "".join(repr(noodle) for noodle in self.wad().noodles()) + "}"
+    def log_string(self):
+        result = "{"
+        for noodle in self.wad().noodles():
+            result += noodle.log_string()
+        return result + "}"
 
 
 NULL_INST = Null()

@@ -1,7 +1,3 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+debug = True
 
-MODE_NORMAL = 1
-MODE_DEBUG = 2
-
-mode = MODE_DEBUG

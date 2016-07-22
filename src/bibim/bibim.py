@@ -8,7 +8,7 @@ from .io import read_data
 from .lexer import lexer
 from .parser import parser
 from .utils import safe_get_value
-
+from .mode import debug
 
 #
 # try:
@@ -60,7 +60,10 @@ def run(bowl_inst):
         #     bowl=bowl_inst,
         #     # mem=datatype.MEM
         # )
-        datatype.MEM.set_current_noodle_number(current_noodle.nn_expr().eval())
+        current_nn = current_noodle.nn_expr().eval()
+        if debug:
+            print("\nCurrent noodle number: %s" % current_nn.log_string())
+        datatype.MEM.set_current_noodle_number(current_nn)
         current_noodle.expr().eval()
         current_noodle = get_next_noodle(bowl_inst)
 

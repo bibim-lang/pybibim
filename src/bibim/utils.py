@@ -16,11 +16,11 @@ def filtered_str(string):
 #     if mode == MODE_DEBUG:
 #         assert isinstance(expr, datatype.Expr), \
 #             "expr is must be an Expr but expr is not an Expr: %s" \
-#             % (repr(expr),)
+#             % (expr.log_string(),)
 #         evaled_expr = expr.eval()
 #         assert isinstance(evaled_expr, datatype.ValueExpr), \
 #             "evaled_expr is must be an ValueExpr but evaled_expr is not an " \
-#             "ValueExpr: %s" % (repr(evaled_expr),)
+#             "ValueExpr: %s" % (evaled_expr.log_string(),)
 #         return evaled_expr
 #     else:
 #         try:
@@ -45,11 +45,11 @@ def safe_get_evaled_expr(expr):
 #         elif not isinstance(value, datatype.Value):
 #             raise AssertionError(
 #                 "value is must be an Value but value is not an Value: %s"
-#                 % (repr(value),))
+#                 % (value.log_string(),))
 #         if not is_null and cls is not None:
 #             assert isinstance(value, cls), \
 #                 "value is must be an %s but value is not an %s: %s" \
-#                 % (cls.__name__, cls.__name__, repr(value),)
+#                 % (cls.__name__, cls.__name__, value.log_string(),)
 #         return value
 #     else:
 #         try:
