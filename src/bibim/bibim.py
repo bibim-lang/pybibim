@@ -8,27 +8,27 @@ from .lexer import lexer
 from . import datatype
 from .io import read_data
 from .utils import safe_get_value
-
-try:
-    from rpython.rlib.jit import JitDriver
-except ImportError:
-    class JitDriver(object):
-        def __init__(self, **kw): pass
-
-        def jit_merge_point(self, **kw): pass
-
-        def can_enter_jit(self, **kw): pass
-
-jitdriver = JitDriver(
-    greens=[
-        'current_noodle',
-        'bowl'
-    ],
-    reds=[
-        # 'mem'
-    ],
-    is_recursive=True
-)
+#
+# try:
+#     from rpython.rlib.jit import JitDriver
+# except ImportError:
+#     class JitDriver(object):
+#         def __init__(self, **kw): pass
+#
+#         def jit_merge_point(self, **kw): pass
+#
+#         def can_enter_jit(self, **kw): pass
+#
+# jitdriver = JitDriver(
+#     greens=[
+#         'current_noodle',
+#         'bowl'
+#     ],
+#     reds=[
+#         # 'mem'
+#     ],
+#     # is_recursive=True
+# )
 
 
 def parse(code_string):
@@ -53,11 +53,11 @@ def run(bowl_inst):
     datatype.MEM.set_current_noodle_number(datatype.NULL_EXPR_INST)
     current_noodle = get_next_noodle(bowl_inst)
     while current_noodle is not None:
-        jitdriver.jit_merge_point(
-            current_noodle=current_noodle,
-            bowl=bowl_inst,
-            # mem=datatype.MEM
-        )
+        # jitdriver.jit_merge_point(
+        #     current_noodle=current_noodle,
+        #     bowl=bowl_inst,
+        #     # mem=datatype.MEM
+        # )
         datatype.MEM.set_current_noodle_number(current_noodle.nn_expr().eval())
         current_noodle.expr().eval()
         current_noodle = get_next_noodle(bowl_inst)
@@ -126,10 +126,10 @@ def entry_point(argv):
         print("You must supply a filename")
         return 1
 
-    import time
-    start_time = time.time()
+    # import time
+    # start_time = time.time()
 
     run_file(os.open(filename, os.O_RDONLY, 0o777))
 
-    print("runtime: %s sec" % (time.time() - start_time))
+    # print("runtime: %s sec" % (time.time() - start_time))
     return 0
