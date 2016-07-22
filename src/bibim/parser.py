@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from rply import ParserGenerator, Token
+from rply import ParserGenerator
+
+from . import datatype
 from .expr_func import *
 from .lexer import op_map
-from . import datatype
 from .utils import filtered_str
 
 pg = ParserGenerator(

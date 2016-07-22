@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from rply.token import BaseBox
 
 from .io import read_data, write_data, STDIN, STDOUT
-from .mode import mode, MODE_DEBUG
 
 
 class Base(BaseBox):

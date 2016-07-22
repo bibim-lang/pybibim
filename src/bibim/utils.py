@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .mode import mode, MODE_DEBUG
 from . import datatype
 
 

@@ -3,11 +3,13 @@ from __future__ import absolute_import
 
 import os
 
-from .parser import parser
-from .lexer import lexer
 from . import datatype
 from .io import read_data
+from .lexer import lexer
+from .parser import parser
 from .utils import safe_get_value
+
+
 #
 # try:
 #     from rpython.rlib.jit import JitDriver
