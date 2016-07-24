@@ -146,10 +146,14 @@ def entry_point(argv):
         print("You must supply a filename")
         return 1
 
-    # import time
-    # start_time = time.time()
+    fp = os.open(filename, os.O_RDONLY, 0o777)
 
-    run_file(os.open(filename, os.O_RDONLY, 0o777))
+    if debug:
+        import time
+        start_time = time.time()
+        run_file(fp)
+        print("runtime: %s sec" % (time.time() - start_time))
+    else:
+        run_file(fp)
 
-    # print("runtime: %s sec" % (time.time() - start_time))
     return 0
