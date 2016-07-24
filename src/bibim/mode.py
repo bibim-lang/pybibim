@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-debug = True
-
+debug_loop = False
+debug_time = True

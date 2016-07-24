@@ -8,7 +8,7 @@ from .io import read_data
 from .lexer import lexer
 from .parser import parser
 from .utils import safe_get_value
-from .mode import debug
+from .mode import debug_time, debug_loop
 
 #
 # try:
@@ -61,23 +61,23 @@ def run(bowl_inst):
         #     # mem=datatype.MEM
         # )
         current_nn_expr = current_noodle.nn_expr()
-        if debug:
+        if debug_loop:
             print("Noodle number expression: %s" % current_nn_expr.log_expr())
         current_nn = current_nn_expr.eval()
-        if debug:
+        if debug_loop:
             print("Noodle number: %s" % current_nn.log_expr())
         datatype.MEM.set_current_noodle_number(current_nn)
         current_n_expr = current_noodle.expr()
-        if debug:
+        if debug_loop:
             print("Noodle expression: %s" % current_n_expr.log_expr())
-        if debug:
+        if debug_loop:
             print("STDIN/OUT start")
         current_n = current_noodle.expr().eval()
-        if debug:
+        if debug_loop:
             print("\nSTDIN/OUT end")
-        if debug:
+        if debug_loop:
             print("Noodle expression result: %s" % current_n.log_expr())
-        if debug:
+        if debug_loop:
             print("Memory: %s" % datatype.MEM.log_contents())
         current_noodle = get_next_noodle(bowl_inst)
         # raw_input("PRESS ENTER TO CONTINUE.")
@@ -148,7 +148,7 @@ def entry_point(argv):
 
     fp = os.open(filename, os.O_RDONLY, 0o777)
 
-    if debug:
+    if debug_time:
         import time
         start_time = time.time()
         run_file(fp)
