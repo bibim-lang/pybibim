@@ -60,12 +60,27 @@ def run(bowl_inst):
         #     bowl=bowl_inst,
         #     # mem=datatype.MEM
         # )
-        current_nn = current_noodle.nn_expr().eval()
+        current_nn_expr = current_noodle.nn_expr()
         if debug:
-            print("\nCurrent noodle number: %s" % current_nn.log_string())
+            print("Noodle number expression: %s" % current_nn_expr.log_expr())
+        current_nn = current_nn_expr.eval()
+        if debug:
+            print("Noodle number: %s" % current_nn.log_expr())
         datatype.MEM.set_current_noodle_number(current_nn)
-        current_noodle.expr().eval()
+        current_n_expr = current_noodle.expr()
+        if debug:
+            print("Noodle expression: %s" % current_n_expr.log_expr())
+        if debug:
+            print("STDIN/OUT start")
+        current_n = current_noodle.expr().eval()
+        if debug:
+            print("\nSTDIN/OUT end")
+        if debug:
+            print("Noodle expression result: %s" % current_n.log_expr())
+        if debug:
+            print("Memory: %s" % datatype.MEM.log_contents())
         current_noodle = get_next_noodle(bowl_inst)
+        # raw_input("PRESS ENTER TO CONTINUE.")
 
 
 def get_next_noodle(bowl_inst):

@@ -22,6 +22,9 @@ class Func:
     def log_string(self):
         return "Func"
 
+    def log_expr(self):
+        return "F"
+
 
 class FuncBowl(Func):
     """ bowl operator ':'의 동작을 정의하는 class입니다. """
@@ -39,6 +42,9 @@ class FuncBowl(Func):
 
     def log_string(self):
         return "FuncBowl(%s, %s)" % (self.bowl.log_string(), self.nn.log_string())
+
+    def log_expr(self):
+        return "%s:%s" % (self.bowl.log_expr(), self.nn.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -82,6 +88,9 @@ class FuncAssign(Func):
     def log_string(self):
         return "FuncAssign(%s, %s, %s)" % (self.bowl.log_string(), self.nn.log_string(), self.value_expr.log_string())
 
+    def log_expr(self):
+        return "%s:%s=%s" % (self.bowl.log_expr(), self.nn.log_expr(), self.value_expr.log_expr())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -113,6 +122,9 @@ class FuncDeno(Func):
     def log_string(self):
         return "FuncDeno(%s)" % (self.number.log_string(), )
 
+    def log_expr(self):
+        return "^%s" % (self.number.log_expr(), )
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -141,6 +153,9 @@ class FuncPlus(Func):
 
     def log_string(self):
         return "FuncPlus(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s + %s" % (self.l_number.log_expr(), self.r_number.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -174,6 +189,9 @@ class FuncMinus(Func):
     def log_string(self):
         return "FuncMinus(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
+    def log_expr(self):
+        return "%s - %s" % (self.l_number.log_expr(), self.r_number.log_expr())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -205,6 +223,9 @@ class FuncMul(Func):
 
     def log_string(self):
         return "FuncMul(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s * %s" % (self.l_number.log_expr(), self.r_number.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -249,6 +270,12 @@ class FuncNumberSep(Func):
             return datatype.NULL_EXPR_INST
         return datatype.ValueExpr(l_number.div(r_number))
 
+    def log_string(self):
+        return "FuncNumberSep(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s/%s" % (self.l_number.log_expr(), self.r_number.log_expr())
+
 
 class FuncAnd(Func):
     """ and operator '&'의 동작을 정의하는 class입니다. """
@@ -266,6 +293,9 @@ class FuncAnd(Func):
 
     def log_string(self):
         return "FuncAnd(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s & %s" % (self.l_number.log_expr(), self.r_number.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -299,6 +329,9 @@ class FuncOr(Func):
     def log_string(self):
         return "FuncOr(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
+    def log_expr(self):
+        return "%s | %s" % (self.l_number.log_expr(), self.r_number.log_expr())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -328,6 +361,9 @@ class FuncNot(Func):
     def log_string(self):
         return "FuncNot(%s)" % (self.number.log_string(), )
 
+    def log_expr(self):
+        return "!%s" % (self.number.log_expr(), )
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -356,6 +392,9 @@ class FuncEq(Func):
 
     def log_string(self):
         return "FuncEq(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s ?= %s" % (self.l_number.log_expr(), self.r_number.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
@@ -389,6 +428,9 @@ class FuncGt(Func):
     def log_string(self):
         return "FuncGt(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
 
+    def log_expr(self):
+        return "%s > %s" % (self.l_number.log_expr(), self.r_number.log_expr())
+
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.
 
@@ -420,6 +462,9 @@ class FuncLt(Func):
 
     def log_string(self):
         return "FuncLt(%s, %s)" % (self.l_number.log_string(), self.r_number.log_string())
+
+    def log_expr(self):
+        return "%s < %s" % (self.l_number.log_expr(), self.r_number.log_expr())
 
     def call(self):
         """ Expr이 평가될 때 실행되는 method입니다.

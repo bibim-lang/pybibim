@@ -14,6 +14,9 @@ class Base(BaseBox):
     def log_string(self):
         return "Base"
 
+    def log_expr(self):
+        return "B"
+
 
 class Value(Base):
     """ Value class는 아무 역할도 하지 않습니다.
@@ -23,6 +26,9 @@ class Value(Base):
 
     def log_string(self):
         return "Value"
+
+    def log_expr(self):
+        return "V"
 
 
 class Expr(Base):
@@ -46,6 +52,9 @@ class Expr(Base):
 
     def log_string(self):
         return "Expr(%s)" % (self._func.log_string(),)
+
+    def log_expr(self):
+        return "%s" % (self._func.log_expr(), )
 
 
 class ValueExpr(Expr):
@@ -76,11 +85,17 @@ class ValueExpr(Expr):
     def log_string(self):
         return "ValueExpr(%s)" % (self._value.log_string())
 
+    def log_expr(self):
+        return "%s" % (self._value.log_expr(), )
+
 
 class Null(Value):
     """ 정의되지 않은 값을 가지는 Value입니다."""
 
     def log_string(self):
+        return "Null"
+
+    def log_expr(self):
         return "Null"
 
 
@@ -408,6 +423,12 @@ class Number(Value):
         else:
             return "%d/%d" % (self._numerator, self._denominator)
 
+    def log_expr(self):
+        if self._denominator == 1:
+            return "%d" % (self._numerator,)
+        else:
+            return "%d/%d" % (self._numerator, self._denominator)
+
 
 class Noodle(Base):
     """ Wad에 담길 Noodle class입니다. """
@@ -451,6 +472,9 @@ class Noodle(Base):
     def log_string(self):
         return "[%s; %s]" % (self.nn_expr().log_string(), self._expr.log_string())
 
+    def log_expr(self):
+        return "[%s; %s]" % (self.nn_expr().log_expr(), self._expr.log_expr())
+
 
 class Wad(Base):
     """ Bowl의 Noodle들을 담고 있는 class입니다. """
@@ -488,6 +512,12 @@ class Wad(Base):
         result = ""
         for noodle in self._noodles:
             result += noodle.log_string()
+        return result
+
+    def log_expr(self):
+        result = ""
+        for noodle in self._noodles:
+            result += noodle.log_expr()
         return result
 
 
@@ -599,6 +629,9 @@ class Bowl(Value):
     def log_string(self):
         return "{%s}" % (self._wad.log_string(),)
 
+    def log_expr(self):
+        return "{%s}" % (self._wad.log_expr(),)
+
 
 class Memory(Bowl):
     """ '@' 문자에 매핑되는 특수 Bowl class입니다. """
@@ -672,6 +705,15 @@ class Memory(Bowl):
         for noodle in self.wad().noodles():
             result += noodle.log_string()
         return result + "}"
+
+    def log_expr(self):
+        return "@"
+
+    def log_contents(self):
+        result = "{"
+        for noodle in self.wad().noodles():
+            result += "\n  " + noodle.log_expr()
+        return result + "\n}"
 
 
 NULL_INST = Null()
