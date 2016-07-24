@@ -185,7 +185,7 @@ class Number(Value):
         :return: 연산 결과
         :rtype: Number
         """
-        return Number.from_bool(bool(self))
+        return Number(0) if self._numerator == 0 else Number(1)
 
     def neg(self):
         """ -number 값을 반환합니다.
@@ -383,7 +383,7 @@ class Number(Value):
         :return: 연산 결과
         :rtype: Number
         """
-        return Number.from_bool(not bool(self))
+        return Number(1) if self._numerator == 0 else Number(0)
 
     def eq_f(self, other):
         """ other와 자신이 같으면 Number(1)을, 다르면 Number(0)을 반환합니다.
