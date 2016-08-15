@@ -189,8 +189,11 @@ def expr_lt(p):
 
 @pg.error
 def error_handler(token):
-    raise ValueError("Ran into a '%s' where it was't expected at %s:%s" % (
-        token.value, token.source_pos.lineno, token.source_pos.colno))
+    if token.source_pos:
+        raise ValueError("Ran into a '%s' where it was't expected at %s:%s" % (
+            token.value, token.source_pos.lineno, token.source_pos.colno))
+    else:
+        raise ValueError("Unexpected error on parsing token '%s'" % (token.value,))
 
 
 parser = pg.build()
