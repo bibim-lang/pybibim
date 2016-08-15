@@ -554,7 +554,7 @@ class Bowl(Value):
         """
         wad = Wad(None)
         noodle_num = Number(0)
-        for c in s:
+        for c in s.decode("utf-8"):
             wad.put(Noodle(ValueExpr(noodle_num), ValueExpr(Number(ord(c)))))
             noodle_num = noodle_num.add(Number(1))
         return Bowl(wad)

@@ -14,7 +14,6 @@ def read_data(fp):
         if len(read) == 0:
             break
         data += read
-    # return data.decode('utf-8')  # todo: 왜인지 rpython에서 오류 생김. 수정할 것. stdin은 괜찮은데 runfile에서만 문제생김
     return data
 
 
