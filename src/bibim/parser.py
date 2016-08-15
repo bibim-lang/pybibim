@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from rply import ParserGenerator
 
-from . import datatype
+from . import datatype, io
 from .expr_func import *
 from .lexer import op_map
 from .utils import filtered_str
@@ -190,10 +190,16 @@ def expr_lt(p):
 @pg.error
 def error_handler(token):
     if token.source_pos:
-        raise ValueError("Ran into a '%s' where it was't expected at %s:%s" % (
+        raise gen_error("Ran into a '%s' where it was't expected at %s:%s" % (
             token.value, token.source_pos.lineno, token.source_pos.colno))
     else:
-        raise ValueError("Unexpected error on parsing token '%s'" % (token.value,))
+        raise gen_error("Unexpected error on parsing token '%s'" % (token.value,))
+
+
+def gen_error(msg):
+    io.write_data(io.STDOUT, ("Parse Error: %s\n" % (msg,)).decode("utf-8"))
+    return ValueError(msg)
+
 
 
 parser = pg.build()

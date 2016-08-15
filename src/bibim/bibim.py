@@ -3,12 +3,12 @@ from __future__ import absolute_import
 
 import os
 
-from . import datatype
-from .io import read_data
+from . import datatype, io
 from .lexer import lexer
 from .parser import parser
 from .utils import safe_get_value
 from .mode import debug_time, debug_loop
+
 
 #
 # try:
@@ -133,10 +133,15 @@ def is_nextable_nn(number):
 
 
 def run_file(fp):
-    code = read_data(fp)
+    code = io.read_data(fp)
     os.close(fp)
-    bowl = parse(code)
-    run(bowl)
+    try:
+        bowl = parse(code)
+        run(bowl)
+    except ValueError as e:
+        pass
+    except RuntimeError as e:
+        pass
 
 
 def entry_point(argv):
@@ -146,14 +151,18 @@ def entry_point(argv):
         print("You must supply a filename")
         return 1
 
-    fp = os.open(filename, os.O_RDONLY, 0o777)
+    try:
+        fp = os.open(filename, os.O_RDONLY, 0o777)
 
-    if debug_time:
-        import time
-        start_time = time.time()
-        run_file(fp)
-        print("runtime: %s sec" % (time.time() - start_time))
-    else:
-        run_file(fp)
+        if debug_time:
+            import time
+            start_time = time.time()
+            run_file(fp)
+            print("runtime: %s sec" % (time.time() - start_time))
+        else:
+            run_file(fp)
+    except OSError as e:
+        io.write_data(io.STDOUT, ("Cannot open file %s\n" % (filename,)).decode("utf-8"))
+        pass
 
     return 0

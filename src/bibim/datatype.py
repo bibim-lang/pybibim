@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 from rply.token import BaseBox
 
-from .io import read_data, write_data, STDIN, STDOUT
+from . import io
 
 
 class Base(BaseBox):
@@ -54,7 +54,7 @@ class Expr(Base):
         return "Expr(%s)" % (self._func.log_string(),)
 
     def log_expr(self):
-        return "%s" % (self._func.log_expr(), )
+        return "%s" % (self._func.log_expr(),)
 
 
 class ValueExpr(Expr):
@@ -86,7 +86,7 @@ class ValueExpr(Expr):
         return "ValueExpr(%s)" % (self._value.log_string())
 
     def log_expr(self):
-        return "%s" % (self._value.log_expr(), )
+        return "%s" % (self._value.log_expr(),)
 
 
 class Null(Value):
@@ -576,14 +576,14 @@ class Bowl(Value):
             except KeyError:
                 break
             noodle_value = noodle.expr().eval().value()
-            # if not isinstance(noodle_value, Number):
-            #     raise RuntimeError("Could not convert it to string, "
-            #                        "noodle value is not a Number: %s" % (
-            #                            noodle_value.log_string()))
-            # elif noodle_value.denominator() != 1:
-            #     raise RuntimeError("Could not convert it to string, "
-            #                        "noodle value's denominator is not 1: %s"
-            #                        % (noodle_value.log_string()))
+            if not isinstance(noodle_value, Number):
+                raise gen_error("Could not convert it to string, "
+                                "noodle value is not a Number: %s" % (
+                                    noodle_value.log_string()))
+            elif noodle_value.denominator() != 1:
+                raise gen_error("Could not convert it to string, "
+                                "noodle value's denominator is not 1: %s"
+                                % (noodle_value.log_string()))
             result += unichr(noodle_value.numerator())
             index += 1
         return result
@@ -598,9 +598,9 @@ class Bowl(Value):
         """
         for noodle in self.wad().noodles():
             nn = noodle.nn_expr().eval().value()
-            # if not isinstance(nn, Number):
-            #     raise AssertionError("Noodle numbers must be a Number. %s is "
-            #                          "not a Number" % (nn.log_string(),))
+            if not isinstance(nn, Number):
+                raise gen_error("Noodle numbers must be a Number. %s is "
+                                "not a Number" % (nn.log_string(),))
             if nn.eq(number):
                 return noodle
         raise KeyError("Cannot found the noodle")
@@ -617,9 +617,9 @@ class Bowl(Value):
         """
         for noodle in self.wad().noodles():
             nn = noodle.nn_expr().eval().value()
-            # if not isinstance(nn, Number):
-            #     raise AssertionError("Noodle numbers must be a Number. %s is "
-            #                          "not a Number" % (nn.log_string(),))
+            if not isinstance(nn, Number):
+                raise gen_error("Noodle numbers must be a Number. %s is "
+                                "not a Number" % (nn.log_string(),))
             if nn.eq(number):
                 noodle.set_expr(value_expr)
                 return NULL_EXPR_INST
@@ -655,7 +655,7 @@ class Memory(Bowl):
         :rtype: Noodle
         """
         if number.eq(Memory.NN_IO):
-            input_str = read_data(STDIN)
+            input_str = io.read_data(io.STDIN)
             return Noodle(ValueExpr(Memory.NN_IO),
                           ValueExpr(Bowl.from_str(input_str)))
         else:
@@ -680,11 +680,11 @@ class Memory(Bowl):
         """
         if number.eq(Memory.NN_IO):
             bowl_to_print = value_expr.value()
-            # if not isinstance(bowl_to_print, Bowl):
-            #     raise RuntimeError("Could not print it as string, "
-            #                        "expr is not a Bowl: %s" % (
-            #                            bowl_to_print.log_string()))
-            write_data(STDOUT, Bowl.to_str(bowl_to_print))
+            if not isinstance(bowl_to_print, Bowl):
+                raise gen_error("Could not print it as string, "
+                                "expr is not a Bowl: %s" % (
+                                    bowl_to_print.log_string()))
+            io.write_data(io.STDOUT, Bowl.to_str(bowl_to_print))
             return NULL_EXPR_INST
         elif number.eq(Memory.NN_CURRENT_NOODLE):
             return NULL_EXPR_INST
@@ -714,6 +714,11 @@ class Memory(Bowl):
         for noodle in self.wad().noodles():
             result += "\n  " + noodle.log_expr()
         return result + "\n}"
+
+
+def gen_error(msg):
+    io.write_data(io.STDOUT, ("Runtime Error: %s\n" % (msg,)).decode("utf-8"))
+    return RuntimeError(msg)
 
 
 NULL_INST = Null()
