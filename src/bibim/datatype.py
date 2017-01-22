@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from rply.token import BaseBox
 from rpython.rlib.rbigint import rbigint
+from rpython.rlib import jit
 
 from . import io
 
@@ -11,6 +12,7 @@ class Base(BaseBox):
 
     대신, 모든 Datatype의 부모 class로 동작하여 다형성을 유지합니다.
     """
+    _immutable_ = True
 
     def log_string(self):
         return "Base"
@@ -24,6 +26,7 @@ class Value(Base):
 
     대신, Null, Number, Bowl의 부모 class로 동작하여 다형성을 유지합니다.
     """
+    _immutable_ = True
 
     def log_string(self):
         return "Value"
@@ -34,6 +37,8 @@ class Value(Base):
 
 class Expr(Base):
     """ Expr class는 Bibim의 Expression 입니다. """
+    _immutable_ = True
+    _immutable_fields_ = ["_func"]
 
     def __init__(self, func):
         """ ExprFunc Func instance로 새 expr를 만듭니다.
@@ -59,6 +64,9 @@ class Expr(Base):
 
 
 class ValueExpr(Expr):
+    _immutable_ = True
+    _immutable_fields_ = ["_value"]
+
     def __init__(self, value):
         """ Value를 가지는 새로운 ValueExpr을 만듭니다.
 
@@ -67,6 +75,7 @@ class ValueExpr(Expr):
         """
         self._value = value
 
+    @jit.elidable
     def eval(self):
         """ ValueExpr을 평가한 결과를 반환합니다.
 
@@ -75,6 +84,7 @@ class ValueExpr(Expr):
         """
         return self
 
+    @jit.elidable
     def value(self):
         """ 해당 ValueExpr의 value를 반환합니다.
 
@@ -92,6 +102,7 @@ class ValueExpr(Expr):
 
 class Null(Value):
     """ 정의되지 않은 값을 가지는 Value입니다."""
+    _immutable_ = True
 
     def log_string(self):
         return "Null"
@@ -102,6 +113,9 @@ class Null(Value):
 
 class Number(Value):
     """ 기약분수 꼴로 표현되는 유리수를 가지는 Value입니다. """
+    _immutable_ = True
+    _immutable_fields_ = ["_numerator", "_denominator"]
+
     R_ZERO = rbigint.fromint(0)
     R_ONE = rbigint.fromint(1)
 
@@ -118,6 +132,7 @@ class Number(Value):
         return Number.ZERO_V
 
     @staticmethod
+    @jit.elidable
     def gcd(a, b):
         """ 정수 a와 b의 최소공배수를 계산합니다.
         :type a: rbigint
@@ -152,6 +167,7 @@ class Number(Value):
             self._numerator = numerator.div(g)
             self._denominator = denominator.div(g)
 
+    @jit.elidable
     def numerator(self):
         """ Number의 분자를 정수로 반환합니다.
 
@@ -160,6 +176,7 @@ class Number(Value):
         """
         return self._numerator
 
+    @jit.elidable
     def denominator(self):
         """ Number의 분모를 정수로 반환합니다.
 
@@ -168,6 +185,7 @@ class Number(Value):
         """
         return self._denominator
 
+    @jit.elidable
     def denominator_number(self):
         """ Number의 분모를 반환합니다.
 
@@ -179,6 +197,7 @@ class Number(Value):
         """
         return Number(self._denominator)
 
+    @jit.elidable
     def __nonzero__(self):
         """ Number 값이 Number.ZERO일 경우 False를, 그 외의 경우에는 True를 반환합니다.
 
@@ -189,6 +208,7 @@ class Number(Value):
         return self._numerator.ne(Number.R_ZERO)
 
     @staticmethod
+    @jit.elidable
     def from_bool(bool_value):
         """ bool_value가 True면 Number.ONE을, 그 외의 경우에는 Number.ZERO을 반환합니다.
 
@@ -199,6 +219,7 @@ class Number(Value):
         """
         return Number.ONE() if bool_value is True else Number.ZERO()
 
+    @jit.elidable
     def bool_f(self):
         """ Number 값이 Number.ZERO일 경우 Number.ZERO를, 그 외의 경우에는 Number.ONE을
         반환합니다.
@@ -208,6 +229,7 @@ class Number(Value):
         """
         return Number.ZERO() if self._numerator.eq(Number.R_ZERO) else Number.ONE()
 
+    @jit.elidable
     def neg(self):
         """ -number 값을 반환합니다.
 
@@ -216,6 +238,7 @@ class Number(Value):
         """
         return Number(self.numerator().neg(), self.denominator())
 
+    @jit.elidable
     def mul(self, other):
         """ number와 other의 곱을 반환합니다.
 
@@ -235,6 +258,7 @@ class Number(Value):
         return Number(self.numerator().mul(other.numerator()),
                       self.denominator().mul(other.denominator()))
 
+    @jit.elidable
     def add(self, other):
         """ number와 other의 합을 반환합니다.
 
@@ -257,6 +281,7 @@ class Number(Value):
             ),
             self.denominator().mul(other.denominator()))
 
+    @jit.elidable
     def sub(self, other):
         """ number와 other의 차를 반환합니다.
 
@@ -275,6 +300,7 @@ class Number(Value):
             return NULL_INST
         return self.add(other.neg())
 
+    @jit.elidable
     def div(self, other):
         """ 자신을 분자로 하고 other를 분모로 하는 새로운 Number를 생성합니다.
 
@@ -294,6 +320,7 @@ class Number(Value):
         return Number(self.numerator().mul(other.denominator()),
                       self.denominator().mul(other.numerator()))
 
+    @jit.elidable
     def _and(self, other):
         """ 자신과 other가 모두 Number.ZERO이 아닌 경우는 Number.ONE을, 그 외의
         경우에는 Number.ZERO을 반환합니다.
@@ -319,6 +346,7 @@ class Number(Value):
             #     return Number.ZERO()
             return Number.ZERO()
 
+    @jit.elidable
     def _or(self, other):
         """ 자신과 other가 모두 Number.ZERO인 경우는 Number.ZERO을, 그 외의
         경우에는 Number.ONE을 반환합니다.
@@ -344,6 +372,7 @@ class Number(Value):
                 #     return Number.ZERO()
                 return Number.ZERO()
 
+    @jit.elidable
     def lt(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
         반환합니다.
@@ -363,6 +392,7 @@ class Number(Value):
             other.numerator().mul(self.denominator())
         )
 
+    @jit.elidable
     def gt(self, other):
         """ 자신이 other보다 클 경우 True를, 그 외의 경우에는 False을
         반환합니다.
@@ -382,6 +412,7 @@ class Number(Value):
            other.numerator().mul(self.denominator())
         )
 
+    @jit.elidable
     def eq(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
         반환합니다.
@@ -400,6 +431,7 @@ class Number(Value):
         return self.numerator().eq(other.numerator()) and \
                self.denominator().eq(other.denominator())
 
+    @jit.elidable
     def not_f(self):
         """ 자신이 Number.ZERO이면 Number.ONE을, 그 외의 경우에는 Number.ZERO을
         반환합니다.
@@ -409,6 +441,7 @@ class Number(Value):
         """
         return Number.ONE() if self._numerator.eq(Number.R_ZERO) else Number.ZERO()
 
+    @jit.elidable
     def eq_f(self, other):
         """ other와 자신이 같으면 Number.ONE을, 다르면 Number.ZERO을 반환합니다.
 
@@ -419,6 +452,7 @@ class Number(Value):
         """
         return Number.from_bool(self.eq(other))
 
+    @jit.elidable
     def gt_f(self, other):
         """ 자신이 other보다 크면 Number.ONE을, 작거나 같으면 Number.ZERO을
         반환합니다.
@@ -430,6 +464,7 @@ class Number(Value):
         """
         return Number.from_bool(self.gt(other))
 
+    @jit.elidable
     def lt_f(self, other):
         """ 자신이 other보다 작으면 Number.ONE을, 크거나 같으면 Number.ZERO을
         반환합니다.
@@ -456,6 +491,7 @@ class Number(Value):
 
 class Noodle(Base):
     """ Wad에 담길 Noodle class입니다. """
+    _immutable_ = None
 
     def __init__(self, nn_expr, expr):
         """ 새로운 Noodle을 생성합니다.
@@ -468,6 +504,7 @@ class Noodle(Base):
         self._nn_expr = nn_expr
         self._expr = expr
 
+    @jit.elidable
     def nn_expr(self):
         """ Noodle의 noodle number를 반환합니다.
 
@@ -502,6 +539,7 @@ class Noodle(Base):
 
 class Wad(Base):
     """ Bowl의 Noodle들을 담고 있는 class입니다. """
+    _immutable_ = None
 
     def __init__(self, noodle):
         """ 새로운 Wad를 생성합니다.
@@ -547,6 +585,7 @@ class Wad(Base):
 
 class Bowl(Value):
     """ Wad를 담는 Bowl class입니다. """
+    _immutable_ = None
 
     def __init__(self, wad):
         """ wad로부터 새로운 Bowl을 생성합니다.
@@ -568,6 +607,7 @@ class Bowl(Value):
         return self._wad
 
     @staticmethod
+    @jit.elidable
     def from_str(s):
         """ 문자열을 Bowl으로 변환합니다.
 
@@ -659,6 +699,7 @@ class Bowl(Value):
 
 class Memory(Bowl):
     """ '@' 문자에 매핑되는 특수 Bowl class입니다. """
+    _immutable_ = None
 
     NN_CURRENT_NOODLE = Number.ZERO()
     NN_IO = Number.ONE()

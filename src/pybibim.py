@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-# def jitpolicy(driver):
-#     from rpython.jit.codewriter.policy import JitPolicy
-#     return JitPolicy()
+def jitpolicy(driver):
+    from rpython.jit.codewriter.policy import JitPolicy
+    return JitPolicy()
 
 
 def target(*args):

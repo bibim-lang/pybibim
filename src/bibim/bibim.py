@@ -10,27 +10,16 @@ from .utils import safe_get_value
 from .mode import debug_time, debug_loop
 
 
-#
-# try:
-#     from rpython.rlib.jit import JitDriver
-# except ImportError:
-#     class JitDriver(object):
-#         def __init__(self, **kw): pass
-#
-#         def jit_merge_point(self, **kw): pass
-#
-#         def can_enter_jit(self, **kw): pass
-#
-# jitdriver = JitDriver(
-#     greens=[
-#         'current_noodle',
-#         'bowl'
-#     ],
-#     reds=[
-#         # 'mem'
-#     ],
-#     # is_recursive=True
-# )
+from rpython.rlib.jit import JitDriver
+
+jitdriver = JitDriver(
+    greens=[
+        'current_noodle',
+        'bowl'
+    ],
+    reds='auto',
+    is_recursive=True
+)
 
 
 def parse(code_string):
@@ -52,21 +41,21 @@ def run(bowl_inst):
     """
     if not isinstance(bowl_inst, datatype.Bowl):
         raise AssertionError('The code must be a Bowl.')
-    datatype.MEM.set_current_noodle_number(datatype.NULL_EXPR_INST)
+    mem = datatype.MEM
+    mem.set_current_noodle_number(datatype.NULL_EXPR_INST)
     current_noodle = get_next_noodle(bowl_inst)
     while current_noodle is not None:
-        # jitdriver.jit_merge_point(
-        #     current_noodle=current_noodle,
-        #     bowl=bowl_inst,
-        #     # mem=datatype.MEM
-        # )
+        jitdriver.jit_merge_point(
+            current_noodle=current_noodle,
+            bowl=bowl_inst
+        )
         current_nn_expr = current_noodle.nn_expr()
         if debug_loop:
             print("Noodle number expression: %s" % current_nn_expr.log_expr())
         current_nn = current_nn_expr.eval()
         if debug_loop:
             print("Noodle number: %s" % current_nn.log_expr())
-        datatype.MEM.set_current_noodle_number(current_nn)
+        mem.set_current_noodle_number(current_nn)
         current_n_expr = current_noodle.expr()
         if debug_loop:
             print("Noodle expression: %s" % current_n_expr.log_expr())
@@ -78,7 +67,7 @@ def run(bowl_inst):
         if debug_loop:
             print("Noodle expression result: %s" % current_n.log_expr())
         if debug_loop:
-            print("Memory: %s" % datatype.MEM.log_contents())
+            print("Memory: %s" % mem.log_contents())
         current_noodle = get_next_noodle(bowl_inst)
         # raw_input("PRESS ENTER TO CONTINUE.")
 
