@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from rply.token import BaseBox
+from rpython.rlib.rbigint import rbigint
 
 from . import io
 
@@ -101,41 +102,61 @@ class Null(Value):
 
 class Number(Value):
     """ 기약분수 꼴로 표현되는 유리수를 가지는 Value입니다. """
+    R_ZERO = rbigint.fromint(0)
+    R_ONE = rbigint.fromint(1)
+
+    @staticmethod
+    def ONE():
+        if not hasattr(Number, "ONE_V"):
+            Number.ONE_V = Number(Number.R_ONE)
+        return Number.ONE_V
+
+    @staticmethod
+    def ZERO():
+        if not hasattr(Number, "ZERO_V"):
+            Number.ZERO_V = Number(Number.R_ZERO)
+        return Number.ZERO_V
 
     @staticmethod
     def gcd(a, b):
-        """ 정수 a와 b의 최소공배수를 계산합니다. """
-        while b:
-            a, b = b, a % b
+        """ 정수 a와 b의 최소공배수를 계산합니다.
+        :type a: rbigint
+        :type b: rbigint
+        """
+        while b.ne(Number.R_ZERO):
+            a, b = b, a.mod(b)
         return a
 
-    def __init__(self, numerator, denominator=1):
+    def __init__(self, numerator, denominator=None):
         """ 새로운 Number를 하나 이상의 정수로부터 만듭니다.
 
         분모를 정의하지 않았을 경우, 기본적으로 1이 사용됩니다.
 
         :param numerator: 분자
-        :type numerator: int
+        :type numerator: rbigint
         :param denominator: 분모
-        :type denominator: int
+        :type denominator: rbigint
         """
 
-        if denominator == 0:
+        if denominator is None:
+            denominator = Number.R_ONE
+
+        if denominator.eq(Number.R_ZERO):
             raise AssertionError('Zero cannot be a denominator.')
 
-        if denominator == 1:
+        if denominator.eq(Number.R_ONE):
             self._numerator = numerator
-            self._denominator = 1
+            self._denominator = Number.R_ONE
         else:
             g = Number.gcd(numerator, denominator)
-            self._numerator = numerator // g
-            self._denominator = denominator // g
+            self._numerator = numerator.div(g)
+            self._denominator = denominator.div(g)
 
     def numerator(self):
         """ Number의 분자를 정수로 반환합니다.
 
         :return: 분자
-        :rtype: int
+        :rtype: rbigint
         """
         return self._numerator
 
@@ -143,14 +164,14 @@ class Number(Value):
         """ Number의 분모를 정수로 반환합니다.
 
         :return: 분모
-        :rtype: int
+        :rtype: rbigint
         """
         return self._denominator
 
     def denominator_number(self):
         """ Number의 분모를 반환합니다.
 
-        denominator property의 경우 int를 반환하지만, 이 method는 Number 객체를
+        denominator property의 경우 rbigint를 반환하지만, 이 method는 Number 객체를
         반환합니다.
 
         :return: 분모
@@ -159,33 +180,33 @@ class Number(Value):
         return Number(self._denominator)
 
     def __nonzero__(self):
-        """ Number 값이 Number(0)일 경우 False를, 그 외의 경우에는 True를 반환합니다.
+        """ Number 값이 Number.ZERO일 경우 False를, 그 외의 경우에는 True를 반환합니다.
 
         만약 Bibim code의 논리 연산 및 비교 연산 결과가 필요할 때에는 이 method의 실행 결과를
-        직접 반환하면 안됩니다. 각 논리 및 비교 연산의 결과는 Number(1) 또는 Number(0)을
+        직접 반환하면 안됩니다. 각 논리 및 비교 연산의 결과는 Number.ONE() 또는 Number.ZERO을
         반환하도록 해야 합니다. 해당 결과를 원한다면, bool_f 메서드를 대신 사용하세요.
         """
-        return self._numerator != 0
+        return self._numerator.ne(Number.R_ZERO)
 
     @staticmethod
     def from_bool(bool_value):
-        """ bool_value가 True면 Number(1)을, 그 외의 경우에는 Number(0)을 반환합니다.
+        """ bool_value가 True면 Number.ONE을, 그 외의 경우에는 Number.ZERO을 반환합니다.
 
         :param bool_value: 변환할 bool값
         :type bool_value: bool
         :return: 변환 결과
         :rtype: Number
         """
-        return Number(1) if bool_value is True else Number(0)
+        return Number.ONE() if bool_value is True else Number.ZERO()
 
     def bool_f(self):
-        """ Number 값이 Number(0)일 경우 Number(0)를, 그 외의 경우에는 Number(1)을
+        """ Number 값이 Number.ZERO일 경우 Number.ZERO를, 그 외의 경우에는 Number.ONE을
         반환합니다.
 
         :return: 연산 결과
         :rtype: Number
         """
-        return Number(0) if self._numerator == 0 else Number(1)
+        return Number.ZERO() if self._numerator.eq(Number.R_ZERO) else Number.ONE()
 
     def neg(self):
         """ -number 값을 반환합니다.
@@ -193,7 +214,7 @@ class Number(Value):
         :return: 연산 결과
         :rtype: Number
         """
-        return Number(-self.numerator(), self.denominator())
+        return Number(self.numerator().neg(), self.denominator())
 
     def mul(self, other):
         """ number와 other의 곱을 반환합니다.
@@ -211,8 +232,8 @@ class Number(Value):
             # else:
             #     return NULL_INST
             return NULL_INST
-        return Number(self.numerator() * other.numerator(),
-                      self.denominator() * other.denominator())
+        return Number(self.numerator().mul(other.numerator()),
+                      self.denominator().mul(other.denominator()))
 
     def add(self, other):
         """ number와 other의 합을 반환합니다.
@@ -231,9 +252,10 @@ class Number(Value):
             #     return NULL_INST
             return NULL_INST
         return Number(
-            self._numerator * other.denominator()
-            + self.denominator() * other.numerator(),
-            self.denominator() * other.denominator())
+            self._numerator.mul(other.denominator()).add(
+                self.denominator().mul(other.numerator())
+            ),
+            self.denominator().mul(other.denominator()))
 
     def sub(self, other):
         """ number와 other의 차를 반환합니다.
@@ -269,12 +291,12 @@ class Number(Value):
             # else:
             #     return NULL_INST
             return NULL_INST
-        return Number(self.numerator() * other.denominator(),
-                      self.denominator() * other.numerator())
+        return Number(self.numerator().mul(other.denominator()),
+                      self.denominator().mul(other.numerator()))
 
     def _and(self, other):
-        """ 자신과 other가 모두 Number(0)이 아닌 경우는 Number(1)을, 그 외의
-        경우에는 Number(0)을 반환합니다.
+        """ 자신과 other가 모두 Number.ZERO이 아닌 경우는 Number.ONE을, 그 외의
+        경우에는 Number.ZERO을 반환합니다.
 
         :param other: 연산할 Number
         :type other: Number
@@ -282,45 +304,45 @@ class Number(Value):
         :rtype: Number
         """
         if isinstance(other, Number):
-            if self.numerator() != 0 and other.numerator() != 0:
-                return Number(1)
+            if self.numerator().ne(Number.R_ZERO) and other.numerator().ne(Number.R_ZERO):
+                return Number.ONE()
             else:
-                return Number(0)
+                return Number.ZERO()
         elif isinstance(other, Value):
-            return Number(0)
+            return Number.ZERO()
         else:
             # if mode == MODE_DEBUG:
             #     raise AssertionError('Numbers only can be calculated logically'
             #                          ' with a Value but %s is not a Value.' % (
             #                              other.log_string(),))
             # else:
-            #     return Number(0)
-            return Number(0)
+            #     return Number.ZERO()
+            return Number.ZERO()
 
     def _or(self, other):
-        """ 자신과 other가 모두 Number(0)인 경우는 Number(0)을, 그 외의
-        경우에는 Number(1)을 반환합니다.
+        """ 자신과 other가 모두 Number.ZERO인 경우는 Number.ZERO을, 그 외의
+        경우에는 Number.ONE을 반환합니다.
 
         :param other: 연산할 Number
         :type other: Number
         :return: 연산 결과
         :rtype: Number
         """
-        if self.numerator() != 0:
-            return Number(1)
+        if self.numerator().ne(Number.R_ZERO):
+            return Number.ONE()
         else:
             if isinstance(other, Number):
                 return other.bool_f()
             elif isinstance(other, Value):
-                return Number(0)
+                return Number.ZERO()
             else:
                 # if mode == MODE_DEBUG:
                 #     raise AssertionError('Numbers only can be calculated '
                 #                          'logically with a Value but %s is '
                 #                          'not a Value.' % (other.log_string(),))
                 # else:
-                #     return Number(0)
-                return Number(0)
+                #     return Number.ZERO()
+                return Number.ZERO()
 
     def lt(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
@@ -337,8 +359,9 @@ class Number(Value):
             # else:
             #     return False
             return False
-        return self.numerator() * other.denominator() < \
-               other.numerator() * self.denominator()
+        return self.numerator().mul(other.denominator()).lt(
+            other.numerator().mul(self.denominator())
+        )
 
     def gt(self, other):
         """ 자신이 other보다 클 경우 True를, 그 외의 경우에는 False을
@@ -355,8 +378,9 @@ class Number(Value):
             # else:
             #     return False
             return False
-        return self.numerator() * other.denominator() > \
-               other.numerator() * self.denominator()
+        return self.numerator().mul(other.denominator()).gt(
+           other.numerator().mul(self.denominator())
+        )
 
     def eq(self, other):
         """ 자신이 other보다 작을 경우 True를, 그 외의 경우에는 False을
@@ -373,20 +397,20 @@ class Number(Value):
             # else:
             #     return False
             return False
-        return self.numerator() == other.numerator() and \
-               self.denominator() == other.denominator()
+        return self.numerator().eq(other.numerator()) and \
+               self.denominator().eq(other.denominator())
 
     def not_f(self):
-        """ 자신이 Number(0)이면 Number(1)을, 그 외의 경우에는 Number(0)을
+        """ 자신이 Number.ZERO이면 Number.ONE을, 그 외의 경우에는 Number.ZERO을
         반환합니다.
 
         :return: 연산 결과
         :rtype: Number
         """
-        return Number(1) if self._numerator == 0 else Number(0)
+        return Number.ONE() if self._numerator.eq(Number.R_ZERO) else Number.ZERO()
 
     def eq_f(self, other):
-        """ other와 자신이 같으면 Number(1)을, 다르면 Number(0)을 반환합니다.
+        """ other와 자신이 같으면 Number.ONE을, 다르면 Number.ZERO을 반환합니다.
 
         :param other: 비교할 Number
         :type other: Number
@@ -396,7 +420,7 @@ class Number(Value):
         return Number.from_bool(self.eq(other))
 
     def gt_f(self, other):
-        """ 자신이 other보다 크면 Number(1)을, 작거나 같으면 Number(0)을
+        """ 자신이 other보다 크면 Number.ONE을, 작거나 같으면 Number.ZERO을
         반환합니다.
 
         :param other: 비교할 Number
@@ -407,7 +431,7 @@ class Number(Value):
         return Number.from_bool(self.gt(other))
 
     def lt_f(self, other):
-        """ 자신이 other보다 작으면 Number(1)을, 크거나 같으면 Number(0)을
+        """ 자신이 other보다 작으면 Number.ONE을, 크거나 같으면 Number.ZERO을
         반환합니다.
 
         :param other: 비교할 Number
@@ -418,16 +442,16 @@ class Number(Value):
         return Number.from_bool(self.lt(other))
 
     def log_string(self):
-        if self._denominator == 1:
-            return "%d" % (self._numerator,)
+        if self._denominator.eq(Number.R_ONE):
+            return "%s" % (self._numerator.str(),)
         else:
-            return "%d/%d" % (self._numerator, self._denominator)
+            return "%s/%s" % (self._numerator.str(), self._denominator.str())
 
     def log_expr(self):
-        if self._denominator == 1:
-            return "%d" % (self._numerator,)
+        if self._denominator.eq(Number.R_ONE):
+            return "%s" % (self._numerator.str(),)
         else:
-            return "%d/%d" % (self._numerator, self._denominator)
+            return "%s/%s" % (self._numerator.str(), self._denominator.str())
 
 
 class Noodle(Base):
@@ -553,10 +577,10 @@ class Bowl(Value):
         :rtype: Bowl
         """
         wad = Wad(None)
-        noodle_num = Number(0)
+        noodle_num = Number.ZERO()
         for c in s.decode("utf-8"):
-            wad.put(Noodle(ValueExpr(noodle_num), ValueExpr(Number(ord(c)))))
-            noodle_num = noodle_num.add(Number(1))
+            wad.put(Noodle(ValueExpr(noodle_num), ValueExpr(Number(rbigint.fromint(ord(c))))))
+            noodle_num = noodle_num.add(Number.ONE())
         return Bowl(wad)
 
     @staticmethod
@@ -572,7 +596,7 @@ class Bowl(Value):
         index = 0
         while True:
             try:
-                noodle = bowl.get_noodle(Number(index, 1))
+                noodle = bowl.get_noodle(Number(rbigint.fromint(index)))
             except KeyError:
                 break
             noodle_value = noodle.expr().eval().value()
@@ -580,11 +604,11 @@ class Bowl(Value):
                 raise gen_error("Could not convert it to string, "
                                 "noodle value is not a Number: %s" % (
                                     noodle_value.log_string()))
-            elif noodle_value.denominator() != 1:
+            elif noodle_value.denominator().ne(Number.R_ONE):
                 raise gen_error("Could not convert it to string, "
                                 "noodle value's denominator is not 1: %s"
                                 % (noodle_value.log_string()))
-            result += unichr(noodle_value.numerator())
+            result += unichr(noodle_value.numerator().toint())
             index += 1
         return result
 
@@ -636,8 +660,8 @@ class Bowl(Value):
 class Memory(Bowl):
     """ '@' 문자에 매핑되는 특수 Bowl class입니다. """
 
-    NN_CURRENT_NOODLE = Number(0)
-    NN_IO = Number(1)
+    NN_CURRENT_NOODLE = Number.ZERO()
+    NN_IO = Number.ONE()
 
     def __init__(self):
         """ 새로운 Memory을 생성합니다. """

@@ -127,7 +127,7 @@ def is_nextable_nn(number):
         return False
     current_nn = safe_get_value(current_noodle.expr(), datatype.Number)
     if current_nn is datatype.NULL_INST:
-        return number.numerator() >= 0
+        return number.numerator().ge(datatype.Number.R_ZERO)
     else:
         return number.gt(current_nn)
 

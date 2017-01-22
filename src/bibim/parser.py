@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 from rply import ParserGenerator
+from rpython.rlib.rbigint import rbigint
 
 from . import datatype, io
 from .expr_func import *
@@ -45,7 +46,7 @@ def bowl_wad(p):
 @pg.production('number : NUMBER')
 def number(p):
     number_str = filtered_str(p[0].getstr())
-    number_int = int(number_str)
+    number_int = rbigint.fromstr(number_str)
     return datatype.Number(number_int)
 
 
